@@ -1,0 +1,51 @@
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=yes">
+  <title>WebRTC demo</title>
+  <style>
+    @media( orientation: portrait ){
+      html {
+        transform: rotate(90deg);
+        transform-origin: top right;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 100vh;
+        height: 100vw;
+      }
+    }
+    button {
+      padding: 8px 16px;
+    }
+    pre {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .option {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body onload="start_camera()">
+  <p>
+    <span id="ice-gathering-state" style="visibility: hidden; display: none;"></span>
+  </p>
+  <p>
+    <span id="ice-connection-state" style="visibility: hidden; display: none;"></span>
+  </p>
+  <p>
+    <span id="signaling-state" style="visibility: hidden; display: none;"></span>
+  </p>
+
+  <div id="media">
+      <audio id="audio" autoplay="true"></audio>
+      <video id="video" autoplay="true" playsinline="true" style="margin-left: 5%; width: 95%; height: 100%;"></video>
+  </div>
+  <pre id="data-channel" style="visibility: hidden; display: none;"></pre>
+  <pre id="offer-sdp" style="visibility: hidden; display: none;"></pre>
+  <pre id="answer-sdp" style="visibility: hidden; display: none;"></pre>
+  <script src="static/client.js"></script>
+</body>
+</html>

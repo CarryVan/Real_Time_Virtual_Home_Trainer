@@ -1,0 +1,145 @@
+*{
+  font-family: 'Noto Sans KR', sans-serif;
+  list-style: none;
+  text-decoration: none;
+  border-collapse: collapse;
+  margin:0px;
+  padding: 0px;
+  color: #000;
+}
+
+.head_bg{
+  position: relative;
+  width: 100%;
+  height: 100px;
+  background-color: black;
+}
+
+.head_bg h1{
+  text-align: center;
+  position: relative;
+  top: 25%;
+  color: white;
+}
+
+input[id="menuicon"]{
+  display: none;
+}
+
+input[id="menuicon"] + label{
+  top: -20px;
+  margin-left: 5px;
+  margin-top: 5px;
+  display: block;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  cursor: pointer;
+}
+
+input[id="menuicon"] + label span{
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  border-radius: 30px;
+  background: white;
+  z-index: 2;
+  transition: all .35s;
+}
+
+input[id="menuicon"] + label span:nth-child(1){
+  top: 10%;
+}
+input[id="menuicon"] + label span:nth-child(2){
+  top: 50%;
+  transform: translateY(-50%)
+}
+input[id="menuicon"] + label span:nth-child(3){
+  bottom: 10%;
+}
+
+input[id="menuicon"]:checked + label span:nth-child(1){
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+input[id="menuicon"]:checked + label span:nth-child(2){
+  opacity: 0;
+}
+input[id="menuicon"]:checked + label span:nth-child(3){
+  bottom: 50%;
+  transform: translateY(50%) rotate(-45deg);
+}
+
+div[class="sidebar"]{
+  width: 200px;
+  height: 100%;
+  background: #222;
+  position: fixed;
+  top: 0px;
+  left: -200px;
+  transition: all .35s;
+  z-index: 1;
+}
+
+input[id="menuicon"]:checked + label + div {left:0;}
+
+.sidebar .sidemenu{
+  height: 150px;
+  margin-left: 40px;
+  margin-right: 40px;
+  margin-top: 220px;
+  line-height: 40px;
+}
+
+
+.sidebar .sidemenu button{
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  outline: 0;
+  border: 0;
+  border-bottom:1px solid #E1E1E1;
+  background-color:rgba(0, 0, 0, 0.3);
+}
+
+.workout_database{
+  margin-left: 10%;
+  margin-right: 10%;
+  display: flex;
+  flex-direction: column;
+}
+
+.workout_database > .workouts{
+  display: flex;
+  margin-top: 10%;
+  border: 4px solid gray;
+  border-radius: 15px;
+  height: 100px;
+}
+
+.workout_database > .workouts > li{
+  flex: 1;
+}
+
+.workout_database > .workouts > .videowrapper{
+  flex: 3;
+  margin-right: 3%;
+  margin-top: 1%;
+  margin-bottom: 1%;
+  margin-left: 2%;
+}
+.workout_database > .workouts > li > div{
+  position: relative;
+  margin-top: 50px;
+  transform: translate(0%, -50%);
+  text-align: center;
+  color: black;
+  font-weight: bolder;
+  font-size: 20px;
+}
+
+iframe{
+  border: 0;
+  border-left: 1px solid black;
+}

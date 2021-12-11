@@ -1,0 +1,126 @@
+*{
+  font-family: 'Noto Sans KR', sans-serif;
+  list-style: none;
+  text-decoration: none;
+  border-collapse: collapse;
+  margin:0px;
+  padding: 0px;
+  color: #000;
+}
+
+.head_bg{
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-color: black;
+}
+
+input[id="menuicon"]{
+  display: none;
+}
+
+input[id="menuicon"] + label{
+  top: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  display: block;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  cursor: pointer;
+}
+
+input[id="menuicon"] + label span{
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  border-radius: 30px;
+  background: white;
+  z-index: 2;
+  transition: all .35s;
+}
+
+input[id="menuicon"] + label span:nth-child(1){
+  top: 10%;
+}
+input[id="menuicon"] + label span:nth-child(2){
+  top: 50%;
+  transform: translateY(-50%)
+}
+input[id="menuicon"] + label span:nth-child(3){
+  bottom: 10%;
+}
+
+input[id="menuicon"]:checked + label span:nth-child(1){
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+input[id="menuicon"]:checked + label span:nth-child(2){
+  opacity: 0;
+}
+input[id="menuicon"]:checked + label span:nth-child(3){
+  bottom: 50%;
+  transform: translateY(50%) rotate(-45deg);
+}
+
+div[class="sidebar"]{
+  width: 200px;
+  height: 100%;
+  background: #222;
+  position: fixed;
+  top: 0px;
+  left: -200px;
+  transition: all .35s;
+  z-index: 1;
+}
+
+input[id="menuicon"]:checked + label + div {left:0;}
+
+.sidebar .sidemenu{
+  height: 150px;
+  margin-left: 40px;
+  margin-right: 40px;
+  margin-top: 220px;
+  line-height: 40px;
+}
+
+
+.sidebar .sidemenu button{
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  outline: 0;
+  border: 0;
+  border-bottom:1px solid #E1E1E1;
+  background-color:rgba(0, 0, 0, 0.3);
+}
+
+
+.start{
+  margin-top: 392px;
+  height: 97px;
+  width: 100%;
+}
+
+.start button{
+  background-color: black;
+  color: white;
+  width: 200px;
+  height: 70px;
+  font-size: 30px;
+  font-weight: bolder;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.start button:focus{
+  outline: 0;
+}
+.start button:hover{
+  background-color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
