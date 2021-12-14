@@ -34,7 +34,7 @@ class poseDetector:
                                     self.min_detection_confidence,
                                     self.min_tracking_confidence)
         self.status = 'pushup_x'
-        self.joint = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]
+        self.joint = [8, 0, 7, 9, 10, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
         # with open(f'{model_dir}', 'rb') as f:
             # self.model = pickle.load(f)
 
@@ -97,7 +97,7 @@ class poseDetector:
                 if psland!= None:
                     landmarks = psland.landmark
                 joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
-                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
                 if len(joint_cnt) < 5:
                     raise Exception
                 # X = pd.DataFrame([pose_row])
@@ -131,7 +131,7 @@ class poseDetector:
             
             landmarks = results.pose_landmarks.landmark
             joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
-            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
                 
             # X = pd.DataFrame([pose_row])
             body_language_class = model.predict([pose_row])[0]
