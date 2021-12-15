@@ -234,6 +234,86 @@ function start_camera(){
 
 }
 
+
+
+function negotiate_live() {
+	return pc.createOffer().then(function(offer) {
+			return pc.setLocalDescription(offer);
+	}).then(function() {
+			// wait for ICE gathering to complete
+			return new Promise(function(resolve) {
+					if (pc.iceGatheringState === 'complete') {
+							resolve();
+					} else {
+							function checkState() {
+									if (pc.iceGatheringState === 'complete') {
+											pc.removeEventListener('icegatheringstatechange', checkState);
+											resolve();
+									}
+							}
+							pc.addEventListener('icegatheringstatechange', checkState);
+					}
+			});
+	}).then(function() {
+			var offer = pc.localDescription;
+			return fetch('/offer2', {
+				body: JSON.stringify({
+						sdp: offer.sdp,
+						type: offer.type,
+				}),
+				headers: {
+						'Content-Type': 'application/json'
+				},
+				method: 'POST'
+			});
+	}).then(function(response) {
+		return response.json();
+	}).then(function(answer) {
+		document.getElementById('answer-sdp').textContent = answer.sdp;
+		return pc.setRemoteDescription(answer);
+	}).catch(function(e) {
+		alert(e);
+	});
+}
+
+
+
+
+function live_camera(){
+	pc = createPeerConnection();
+
+	var constraints = {
+			audio: false,
+			video: false,
+	};
+
+	var resolution = "700x400";
+	if (resolution) {
+			resolution = resolution.split('x');
+			constraints.video = {
+					width: parseInt(window.innerHeight, 0),
+					height: parseInt(window.innerWidth, 0),
+					facingMode: "user",
+			};
+	} else {
+			constraints.video = true;
+	}
+
+	if (constraints.video) {
+		document.getElementById('media').style.display = 'block';
+	}
+	navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+			stream.getTracks().forEach(function(track) {
+					pc.addTrack(track, stream);
+			});
+			return negotiate_live();
+	}, function(err) {
+			alert('Could not acquire media: ' + err);
+	});
+
+}
+
+
 function sdpFilterCodec(kind, codec, realSdp) {
     var allowed = []
     var rtxRegex = new RegExp('a=fmtp:(\\d+) apt=(\\d+)\r$');

@@ -4,7 +4,10 @@ import time
 import pickle
 import cv2
 from av import VideoFrame
-
+from tensorflow.keras import models
+import os
+import tensorflow as tf
+import numpy as np
 
 class AudioTransformTrack(MediaStreamTrack):
     
@@ -26,7 +29,6 @@ class VideoTransformTrack(MediaStreamTrack):
     A video stream track that transforms frames from an another track.
     """
     kind = "video"
-    global finish
     def __init__(self, track, exercise_list, cnt_list, set_list, breaktime_list):
         super().__init__()  # don't forget this!
         self.track = track
@@ -179,3 +181,82 @@ class VideoTransformTrack(MediaStreamTrack):
             return new_frame
         else:
             return self.before_frame
+
+
+class VideoTransformTrack2(MediaStreamTrack):
+    
+    kind = "video"
+
+    def __init__(self, track):
+        super().__init__()  # don't forget this!
+        self.track = track
+        self.model = models.load_model(f'./model/all_model')
+        self.class_number = {3: 'lunge_d', 2: 'lunge_u', 4: 'squat_d', 5: 'squat_u', 8: 'legraise_u', 9: 'legraise_d', 11: 'plank_u', 13: 'sitting',
+                           15: 'walking', 16: 'pushup_u', 17: 'pushup_d', 0: 'none_u'}
+        self.detector = pm.poseDetector(
+            model_dir='./model/all_model/body_language_mlp.pkl')
+        self.sequence = []
+        self.pushup_cnt = 0
+        self.leg_cnt = 0
+        self.squat_cnt = 0
+        self.lunge_cnt = 0
+        self.status = "walking"
+        self.drop = -1
+        self.before_frame = ""
+        self.pose_predict = 0
+        self.pose_prob = 0
+        self.plank_cnt = 0
+    async def recv(self):
+        try:
+            self.drop += 1
+            frame = await self.track.recv()
+            if self.drop % 4 == 0:
+                img = frame.to_ndarray(format="bgr24")
+                img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                img = cv2.flip(img, 0)
+
+                pose_row = self.detector.all_classify(img)
+                self.sequence.append(np.array(pose_row))
+
+                if len(self.sequence) == 3:
+                    res = self.model.predict(np.expand_dims(self.sequence, axis=0))[0]
+                    self.sequence = self.sequence[1:]
+                    self.pose_predict = np.argmax(res)
+                    self.pose_prob = res[np.argmax(res)]
+
+                if len(self.status.split("_")) == 2 and self.status.split('_')[1] == 'd' and self.class_number[self.pose_predict].split('_')[1] == 'u' and self.status.split('_')[0] == self.class_number[self.pose_predict].split('_')[0] :
+                    if self.status.split('_')[0] == 'pushup':
+                        self.pushup_cnt += 1
+                    if self.status.split('_')[0] == 'legraise':
+                        self.leg_cnt += 1
+                    if self.status.split('_')[0] == 'squat':
+                        self.squat_cnt += 1
+                    if self.status.split('_')[0] == 'lunge':
+                        self.lunge_cnt += 1
+                
+                self.status = self.class_number[self.pose_predict]
+                cv2.putText(img, self.class_number[self.pose_predict], (30, 30), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)    
+                cv2.putText(img, str(round(self.pose_prob, 2)), (330, 30), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+
+                cv2.putText(img, 'pushup' + str(self.pushup_cnt), (30, 270), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                cv2.putText(img, 'lunge' + str(self.lunge_cnt), (30, 110), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                cv2.putText(img, 'plank' + str(self.plank_cnt), (30, 150), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                cv2.putText(img, 'squat' + str(self.squat_cnt), (30, 190), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                cv2.putText(img, 'legraise' + str(self.leg_cnt), (30, 230), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+
+                new_frame = VideoFrame.from_ndarray(img, format="bgr24")
+                new_frame.pts = frame.pts
+                new_frame.time_base = frame.time_base
+                self.before_frame = new_frame
+                return new_frame
+            else:
+                return self.before_frame
+        except Exception as e:
+            print(e) 
