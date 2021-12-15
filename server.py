@@ -55,7 +55,7 @@ class VideoTransformTrack(MediaStreamTrack):
         super().__init__()  # don't forget this!
         self.track = track
         self.detector = pm.poseDetector(
-            model_dir='./model/all_model/body_language_lr.pkl')
+            model_dir='./model/all_model/body_language_mlp.pkl')
         self.pTime = 0
         self.cnt = 0
         self.drop = -1
@@ -81,7 +81,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.goal = list(map(int, self.cnt_list))
         self.flow = -1
         # self.model="None"
-        with open(f'./model/{str(self.exercise_list[0])}_model/body_language_lr.pkl', 'rb') as f:
+        with open(f'./model/{str(self.exercise_list[0])}_model/body_language_mlp.pkl', 'rb') as f:
             self.model = pickle.load(f)
         self.status = "None"
         self.i = 0
@@ -95,7 +95,7 @@ class VideoTransformTrack(MediaStreamTrack):
     async def recv(self):
         self.drop += 1
         frame = await self.track.recv()
-        if self.drop % 6 == 0:
+        if self.drop % 3 == 0:
             self.drop = 0
             # pose estimate
             img = frame.to_ndarray(format="bgr24")
@@ -181,7 +181,7 @@ class VideoTransformTrack(MediaStreamTrack):
                     if self.pre_set==self.set_list[self.i]:
                         self.i += 1
                         self.preposture = f'{str(self.exercise_list[self.i])}_u'
-                        with open(f'./model/{str(self.exercise_list[self.i])}_model/body_language_lr.pkl', 'rb') as f:
+                        with open(f'./model/{str(self.exercise_list[self.i])}_model/body_language_mlp.pkl', 'rb') as f:
                             self.model = pickle.load(f)
                         self.pre_set=1
                         self.idxx=10
@@ -296,4 +296,6 @@ if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
                 port=8080,
+                ssl_keyfile="./localhost+2-key.pem",
+                ssl_certfile="./localhost+2.pem",
                 reload=True)
