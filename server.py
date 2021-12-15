@@ -4,6 +4,7 @@ import os
 import uuid
 import time
 import pickle
+import sys
 
 import cv2
 import pose_module as pm
@@ -14,13 +15,30 @@ import uvicorn
 from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaBlackhole, MediaPlayer
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+#database
+sys.path.append('./database')
+import crud, models, schemas
+from database import SessionLocal, engine
+from sqlalchemy.orm import Session
+from typing import List
+
 from src.schemas import Offer
 ROOT = os.path.dirname(__file__)
+
+#database connection
+models.Base.metadata.create_all(bind=engine)
+#database Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -39,7 +57,6 @@ class AudioTransformTrack(MediaStreamTrack):
         self.track = track
 
     async def recv(self):
-        print('hi123')
         audio = await self.track.recv()
         # player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
         # audio = player.audio
@@ -92,15 +109,18 @@ class VideoTransformTrack(MediaStreamTrack):
 
         self.label_d=""
         self.label_u=""
+
     async def recv(self):
         self.drop += 1
         frame = await self.track.recv()
-        if self.drop % 6 == 0:
+        if self.drop % 3 == 0:
             self.drop = 0
             # pose estimate
             img = frame.to_ndarray(format="bgr24")
-            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            img = cv2.flip(img, 0)
+            #=================for webcam ==========================
+            # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE) 
+            #img = cv2.flip(img, 0)
+        
             if self.i < len(self.exercise_list):
                 if self.flow == -1:
                     self.start_time = time.time()
@@ -160,8 +180,7 @@ class VideoTransformTrack(MediaStreamTrack):
                         self.flow = 4
                         self.breaktime = self.breaktime_list[self.i]
                     
-
-
+                    
                 if self.flow == 4 and time.time()-self.break_time < self.breaktime:
                     img = self.detector.title(img, "BREAK TIME", str(
                         self.breaktime-int(time.time()-self.break_time)))
@@ -258,7 +277,6 @@ async def offer(params: Offer):
 
     @pc.on("track")
     def on_track(track):
-        print(track.kind)
         if track.kind == "audio":
             local_audio = AudioTransformTrack(track)
             # pc.addTrack(local_audio) 
@@ -284,6 +302,20 @@ async def offer(params: Offer):
 
     return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
 
+#database
+@app.post("/save_workout_session")
+async def save_workout(sws: schemas.SaveWorkoutSession, db: Session = Depends(get_db)):
+    try:
+        crud.save_workout_session(db, sws=sws)
+    except:
+        return "Failed To Save"
+    return "Succesfully saved"
+
+@app.post("/recent_workout", response_model=List[schemas.WorkoutFlow])
+async def recent_workout(db: Session = Depends(get_db)):
+
+    most_recent = crud.get_recent_session(db)
+    print(most_recent)
 
 async def on_shutdown(app):
     # close peer connections

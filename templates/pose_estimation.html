@@ -4,36 +4,49 @@
     <meta charset="UTF-8"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" type="text/css" href="static/pose_estimation.css">
+    <link rel="stylesheet" type="text/css" href="pose_estimation.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <div class="wrap">
-      <div class="head_bg">
-        <input type="checkbox" id="menuicon">
-        <label for="menuicon">
-          <span></span>
-          <span></span>
-          <span></span>
-        </label>
-        <div class="sidebar">
-          <div class="sidemenu">
-            <button onclick="location.href='record.html'">
-              Record
-            </button>
-            <button onclick="location.href='schedule.html';">
-              Schedule
-            </button>
+    <!-- <div class="sidemenu">
+      <button onclick="location.href='record.html'">
+        Record
+      </button>
+      <button onclick="location.href='schedule.html';">
+        Schedule
+      </button>
+    </div> -->
+    
+    <header>
+      <nav>
+        <div class="hamburger">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+        </div>
+        <div class="mylogo" style="cursor: pointer">
+          <p>CarryVan</p><img src="./img/logo.png" />
+        </div>
+      </nav>
+    </header>
+
+    <main>
+
+      <section class="home">
+        <div class="cover">
+          <div class="title">
+            Virtual Home Trainer
           </div>
         </div>
-      </div>
+      </section>
+      
       <div class="start">
         <button onclick="location.href='schedule.html'">
           START
         </button>
       </div>
-    </div>
+    </main>
   </body>
   <script src="static/client.js"></script>
 </html>
