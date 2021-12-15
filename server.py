@@ -39,7 +39,6 @@ class AudioTransformTrack(MediaStreamTrack):
         self.track = track
 
     async def recv(self):
-        print('hi123')
         audio = await self.track.recv()
         # player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
         # audio = player.audio
@@ -258,7 +257,6 @@ async def offer(params: Offer):
 
     @pc.on("track")
     def on_track(track):
-        print(track.kind)
         if track.kind == "audio":
             local_audio = AudioTransformTrack(track)
             # pc.addTrack(local_audio) 
@@ -295,7 +293,7 @@ async def on_shutdown(app):
 if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
-                port=8080,
+                port=8081,
                 ssl_keyfile="./localhost+2-key.pem",
                 ssl_certfile="./localhost+2.pem",
                 reload=True)

@@ -42,9 +42,6 @@ class poseDetector:
     def drawTitle(self,img,title,size,y):
         
         width,height=img.size
-        # height,width=img.size
-        # print(height,width)
-        # print(type(img))
         try: 
             draw = ImageDraw.Draw(img)
             font=ImageFont.truetype("font/GodoM.ttf",size)
@@ -63,7 +60,7 @@ class poseDetector:
                 org=((width-w*2.5),(h))
             draw.text(org,text,font=font,fill=(255,255,255))
         except Exception as e:
-            print(e)
+            pass
         return img
     def title(self, img,title,plus):
         img.flags.writeable = True
@@ -72,7 +69,7 @@ class poseDetector:
             img = self.drawTitle(img,title,85,0)
             img=self.drawTitle(img, plus, 85, 1)
         except Exception as e:
-            print(e)
+            pass
         img = np.array(img)
         return img
 
@@ -102,16 +99,14 @@ class poseDetector:
                     raise Exception
                 # X = pd.DataFrame([pose_row])
                 first = model.predict([pose_row])[0]
-                print(first)
             except Exception as e:
-                print("b")
-                print(e)
+                pass
             
             img = Image.fromarray(empty_img)
             img=self.drawTitle(img, "준비 자세를", 45, 3)
             img=self.drawTitle(img, "취해주세요" , 45, 4)
         except Exception as e:
-            print(e)
+            pass
 
         img = np.array(img)
         return img,first
@@ -162,13 +157,11 @@ class poseDetector:
             cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
             cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
             if idxx==11:
-                print("id")
                 return img, status, cnt , start_time    
             else:
                 return img, status, cnt 
             
         except Exception as e:
-            print(e)
             try:
                 img = Image.fromarray(empty_img)
                 self.drawTitle(img, str(cnt) , 65, 5)
@@ -176,7 +169,7 @@ class poseDetector:
                 cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
                 cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
             except Exception as e:
-                print(e)
+                pass
             if idxx==11:
                 return img, status, cnt , start_time    
             else:
@@ -189,7 +182,7 @@ class poseDetector:
             self.drawTitle(img, str(cnt) , 65, 5)
             img = np.array(img)
         except Exception as e:
-            print(e)
+            pass
         prog=int(width*0.9)
 
         margin=int(width*0.1)
