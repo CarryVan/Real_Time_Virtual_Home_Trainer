@@ -303,6 +303,15 @@ async def offer(params: Offer):
     return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
 
 #database
+@app.get("/one.html", response_class=HTMLResponse)
+async def one(request: Request):
+    return templates.TemplateResponse("one.html", {"request": request})
+
+@app.post("/start_workout")
+async def start_workout(request: Request):
+    
+    print(request)
+
 @app.post("/save_workout_session")
 async def save_workout(sws: schemas.SaveWorkoutSession, db: Session = Depends(get_db)):
     try:

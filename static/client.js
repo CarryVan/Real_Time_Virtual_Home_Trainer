@@ -146,6 +146,7 @@ function negotiate() {
 			var offer = pc.localDescription;
 			return fetch('/offer', {
 				body: JSON.stringify({
+
 						sdp: offer.sdp,
 						type: offer.type,
 						exercise: localStorage.getItem("exercise"),
@@ -198,6 +199,26 @@ function start() {
 	localStorage.setItem("set", set_list)
 	localStorage.setItem("breaktime", breaktime_list)
 	location.href = "start.html";
+
+	$.ajax({
+		type: "post",
+		url: "/start_data",
+		dataType: "json",
+		data: { 
+				"exercise": exercise_list,
+				"cnt": cnt_list,
+				"set": set_list,
+				"breaktime": breaktime_list
+			},
+		success: function(data){
+			alert(data);
+		},
+		error:function(){
+			alert("실패");
+		}
+
+	})
+
 }
 
 function start_camera(){
