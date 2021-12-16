@@ -210,13 +210,11 @@ class VideoTransformTrack2(MediaStreamTrack):
             self.drop += 1
             frame = await self.track.recv()
             img = frame.to_ndarray(format="bgr24")
-            # tmp_img = cv2.resize(img, (480,640))
             
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             img = cv2.flip(img, 0)
             
             if self.drop % 4 == 0:
-                
                 pose_row = self.detector.all_classify(img)
                 self.sequence.append(np.array(pose_row))
                 if len(self.sequence) == 3:
