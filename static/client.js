@@ -77,8 +77,6 @@ function removeList(ths){
 }
 
 
-
-
 // peer connection
 var pc = null;
 
@@ -200,24 +198,21 @@ function start() {
 	localStorage.setItem("breaktime", breaktime_list)
 	location.href = "start.html";
 
-	$.ajax({
-		type: "post",
-		url: "/start_data",
-		dataType: "json",
-		data: { 
-				"exercise": exercise_list,
-				"cnt": cnt_list,
-				"set": set_list,
-				"breaktime": breaktime_list
-			},
-		success: function(data){
-			alert(data);
+	fetch("/save_workout", {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
 		},
-		error:function(){
-			alert("실패");
-		}
-
+		body: JSON.stringify({
+			exercise: localStorage.getItem("exercise"),
+			cnt: localStorage.getItem("cnt"),
+			set: localStorage.getItem("set"),
+			breaktime: localStorage.getItem("breaktime")
+		})
 	})
+	.then(response => response.json())
+	.then(data => console.log(data))
+
 
 }
 

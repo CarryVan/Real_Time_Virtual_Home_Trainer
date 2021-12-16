@@ -15,6 +15,7 @@ class WorkoutFlow(Base):
     sequence = Column(Integer, index=True)
     set = Column(Integer, index=True)
     count = Column(Integer, index=True)
+    breaktime = Column(Integer, index=True)
 
     # workout_session = relationship("workout_count", back_populates="workout_done_check")
 

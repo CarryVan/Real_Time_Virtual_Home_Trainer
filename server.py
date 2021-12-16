@@ -5,6 +5,7 @@ import uuid
 import time
 import pickle
 import sys
+from datetime import datetime
 
 import cv2
 import pose_module as pm
@@ -24,10 +25,11 @@ from fastapi.templating import Jinja2Templates
 sys.path.append('./database')
 import crud, models, schemas
 from database import SessionLocal, engine
+from schemas import SaveWorkout, SaveWorkoutSession
 from sqlalchemy.orm import Session
 from typing import List
 
-from src.schemas import Offer
+from src.schemas import Offer, Info
 ROOT = os.path.dirname(__file__)
 
 #database connection
@@ -307,19 +309,42 @@ async def offer(params: Offer):
 async def one(request: Request):
     return templates.TemplateResponse("one.html", {"request": request})
 
-@app.post("/start_workout")
-async def start_workout(request: Request):
+@app.post("/save_workout")
+async def save_workout(params: Info, db: Session = Depends(get_db)):
     
-    print(request)
+    exercise = params.exercise.split(",")
+    cnt = [int(x) for x in params.cnt.split(",")]
+    set = [int(x) for x in params.set.split(",")]
+    breaktime = [int(x) for x in params.breaktime.split(",")]
 
-@app.post("/save_workout_session")
-async def save_workout(sws: schemas.SaveWorkoutSession, db: Session = Depends(get_db)):
-    try:
-        crud.save_workout_session(db, sws=sws)
-    except:
-        return "Failed To Save"
-    return "Succesfully saved"
+    most_recent = crud.get_recent_session(db)
+    tot_len = len(exercise) + len(breaktime)
 
+    crud.save_workout_session(db)
+
+    print(f"params: {params}")
+    for i in range(tot_len):
+        index = i//2
+        sw = SaveWorkout
+        sw.workout_session = int(most_recent.id) + 1
+        sw.sequence = i
+        
+        if i%2 == 0:    
+            sw.workout_name = exercise[index]
+            sw.set = set[index]
+            sw.count = cnt[index]
+            sw.breaktime = 0
+
+        else:
+            sw.workout_name = "break"
+            sw.set = 0
+            sw.count = 0
+            sw.breaktime = breaktime[index]
+            
+        crud.save_counted_workout(db, sw)
+    
+    return "saved!"
+    
 @app.post("/recent_workout", response_model=List[schemas.WorkoutFlow])
 async def recent_workout(db: Session = Depends(get_db)):
 

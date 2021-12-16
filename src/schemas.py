@@ -8,3 +8,9 @@ class Offer(BaseModel):
     cnt: str
     set: str
     breaktime: str
+
+class Info(BaseModel):
+    exercise: str
+    cnt: str
+    set: str
+    breaktime: str

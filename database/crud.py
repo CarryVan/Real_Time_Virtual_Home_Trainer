@@ -1,4 +1,6 @@
+from datetime import datetime
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.expression import func
 
 import models, schemas
 
@@ -10,17 +12,17 @@ import models, schemas
 #     return db.query(models.User).filter(models.User.email == email).first()
 
 def save_counted_workout(db: Session, sw: schemas.SaveWorkout):
-    db_workout_flow = models.WorkoutFlow(id=sw.id, workout_name=sw.workout_name, sequence=sw.sequence,
-                                set=sw.set, count=sw.count)
+    db_workout_flow = models.WorkoutFlow(workout_session=sw.workout_session, workout_name=sw.workout_name, sequence=sw.sequence,
+                                set=sw.set, count=sw.count, breaktime = sw.breaktime)
     db.add(db_workout_flow)
     db.commit()
     db.refresh(db_workout_flow)
 
     return db_workout_flow
 
-def save_workout_session(db: Session, sws: schemas.SaveWorkoutSession):
+def save_workout_session(db: Session):
 
-    db_workout_session = models.WorkoutSession(date_time=sws.date_time)
+    db_workout_session = models.WorkoutSession()
     db.add(db_workout_session)
     db.commit()
     db.refresh(db_workout_session)
@@ -29,7 +31,7 @@ def save_workout_session(db: Session, sws: schemas.SaveWorkoutSession):
 
 def get_recent_session(db: Session):
     model = models.WorkoutSession
-    return db.query(model.id, func.max(model.date))
+    return db.query(model).order_by(model.id.desc()).first()
 
 
 def get_workout_flows_by_id(db: Session, id:int):

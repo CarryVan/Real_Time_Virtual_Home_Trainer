@@ -10,6 +10,8 @@ class SaveWorkout(BaseModel):
     sequence : int
     set : int
     count : int
+    breaktime : int
+
 
 class WorkoutFlow(SaveWorkout):
 
