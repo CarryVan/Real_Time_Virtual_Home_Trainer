@@ -200,13 +200,14 @@ class VideoTransformTrack2(MediaStreamTrack):
         self.leg_cnt = 0
         self.squat_cnt = 0
         self.lunge_cnt = 0
-        self.status = "walking_u"
+        self.before_status = "walking_u"
         self.drop = -1
         # self.before_frame = ""
         self.pose_predict = 0
         self.pose_prob = 0
         self.plank_cnt = 0
         self.plank_start_time = 0
+        self.workout_cnt = {'lunge': 0, 'squat': 0, 'legraise': 0, 'plank': 0, 'pushup': 0}
 
     async def recv(self):
         try:
@@ -228,42 +229,37 @@ class VideoTransformTrack2(MediaStreamTrack):
                     self.pose_predict = np.argmax(res)
                     self.pose_prob = res[np.argmax(res)]
 
-                if  self.status.split('_')[1] == 'd' and self.class_number[self.pose_predict].split('_')[1] == 'u' and self.status.split('_')[0] == self.class_number[self.pose_predict].split('_')[0] :
-                    if self.status.split('_')[0] == 'pushup':
-                        self.pushup_cnt += 1
-                    elif self.status.split('_')[0] == 'legraise':
-                        self.leg_cnt += 1
-                    elif self.status.split('_')[0] == 'squat':
-                        self.squat_cnt += 1
-                    elif self.status.split('_')[0] == 'lunge':
-                        self.lunge_cnt += 1
-                    elif self.status.split('_')[0] == 'plank':
-                        if self.class_number[self.pose_predict].split('_')[0] != 'plank':
-                            self.plank_start_time = 0
-                        else:
-                            if not self.plank_start_time:
-                                self.plank_start_time = time.time()
-                            self.plank_time = time.time()
-                            if int(self.plank_time - self.plank_start_time) == 1:
-                                self.plank_cnt += 1
-                                self.plank_start_time = self.plank_time
-
+                self.status = self.class_number[self.pose_predict].split("_")
                 
-                self.status = self.class_number[self.pose_predict]
+                if self.status[0] != "plank" and self.status[0] == self.before_status[0] and self.before_status[1] == "d" and self.status[1] == "u":
+                    self.workout_cnt[self.status[0]] += 1
+                
+                if self.status[0] != 'plank':
+                    self.plank_start_time = 0
+                
+                elif self.status[0] == "plank":
+                    if not self.plank_start_time:
+                        self.plank_start_time = time.time()
+                    self.plank_time = time.time()
+                    if int(self.plank_time - self.plank_start_time) >= 1:
+                        self.workout_cnt[self.status[0]] += int(self.plank_time - self.plank_start_time)
+                        self.plank_start_time = self.plank_time
+                self.before_status = self.status
+                
             cv2.putText(img, self.class_number[self.pose_predict], (30, 30), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)    
             cv2.putText(img, str(round(self.pose_prob, 2)), (330, 30), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
 
-            cv2.putText(img, 'pushup' + str(self.pushup_cnt), (30, 270), 
+            cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, 270), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-            cv2.putText(img, 'lunge' + str(self.lunge_cnt), (30, 110), 
+            cv2.putText(img, 'lunge' + str(self.workout_cnt['lunge']), (30, 110), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-            cv2.putText(img, 'plank' + str(self.plank_cnt), (30, 150), 
+            cv2.putText(img, 'plank' + str(self.workout_cnt['plank']), (30, 150), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-            cv2.putText(img, 'squat' + str(self.squat_cnt), (30, 190), 
+            cv2.putText(img, 'squat' + str(self.workout_cnt['squat']), (30, 190), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-            cv2.putText(img, 'legraise' + str(self.leg_cnt), (30, 230), 
+            cv2.putText(img, 'legraise' + str(self.workout_cnt['legraise']), (30, 230), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
 
             new_frame = VideoFrame.from_ndarray(img, format="bgr24")
