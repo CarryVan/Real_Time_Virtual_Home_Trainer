@@ -28,8 +28,6 @@ templates = Jinja2Templates(directory="templates")
 
 logger = logging.getLogger("pc")
 pcs = set()
-
-finish = False
 class AudioTransformTrack(MediaStreamTrack):
     
     kind = "audio"
@@ -50,7 +48,6 @@ class VideoTransformTrack(MediaStreamTrack):
     A video stream track that transforms frames from an another track.
     """
     kind = "video"
-    global finish
     def __init__(self, track, exercise_list, cnt_list, set_list, breaktime_list):
         super().__init__()  # don't forget this!
         self.track = track
@@ -95,7 +92,7 @@ class VideoTransformTrack(MediaStreamTrack):
     async def recv(self):
         self.drop += 1
         frame = await self.track.recv()
-        if self.drop % 6 == 0:
+        if self.drop % 3 == 0:
             self.drop = 0
             # pose estimate
             img = frame.to_ndarray(format="bgr24")
@@ -190,12 +187,15 @@ class VideoTransformTrack(MediaStreamTrack):
                     self.flow = -1
                     self.posture = "None"
                     self.cnt = 0
+                if self.flow == 6:
+                    img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
                         
-                if self.flow == 6 and time.time()-self.goodjob_time < self.time:
-                    img = self.detector.title(img, "참 잘했어요", "bb")
+                # if self.flow == 6 and time.time()-self.goodjob_time < self.time+8:
+                #     img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
 
-                elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
-                    pass
+                # elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
+                #     pass
+
             new_frame = VideoFrame.from_ndarray(img, format="bgr24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
@@ -236,8 +236,9 @@ async def offer(params: Offer):
     offer = RTCSessionDescription(sdp=params.sdp, type=params.type)
 
     pc = RTCPeerConnection()
+    
+
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
-    pcs.add(pc)
 
     # prepare local media
     player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
@@ -268,11 +269,16 @@ async def offer(params: Offer):
                 track, exercise_list=params.exercise, cnt_list=params.cnt, set_list=params.set, breaktime_list=params.breaktime
             )
             pc.addTrack(local_video)
+        
 
         @track.on("ended")
         async def on_ended():
             await recorder.stop()
-            await pc.close()
+            # await pc.close()
+            coros = [pc.close() for pc in pcs]
+            await asyncio.gather(*coros)
+            pcs.clear()
+
 
     # handle offer
     await pc.setRemoteDescription(offer)
@@ -296,4 +302,6 @@ if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
                 port=8080,
+                ssl_keyfile="./localhost+2-key.pem",
+                ssl_certfile="./localhost+2.pem",
                 reload=True)
