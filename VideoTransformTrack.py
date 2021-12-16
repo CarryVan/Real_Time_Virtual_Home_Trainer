@@ -196,10 +196,6 @@ class VideoTransformTrack2(MediaStreamTrack):
         self.detector = pm.poseDetector(
             model_dir='./model/all_model/body_language_mlp.pkl')
         self.sequence = []
-        self.pushup_cnt = 0
-        self.leg_cnt = 0
-        self.squat_cnt = 0
-        self.lunge_cnt = 0
         self.before_status = "walking_u"
         self.drop = -1
         # self.before_frame = ""
