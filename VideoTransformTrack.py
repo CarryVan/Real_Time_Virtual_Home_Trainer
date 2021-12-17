@@ -190,7 +190,13 @@ class VideoTransformTrack2(MediaStreamTrack):
     def __init__(self, track):
         super().__init__()  # don't forget this!
         self.track = track
-        self.model = models.load_model(f'./model/all_model')
+        try:
+            self.model = tf.lite.Interpreter(model_path="./model/all_model/model.tflite")
+            self.model.allocate_tensors()
+            self.input_details = self.model.get_input_details()
+            self.output_details = self.model.get_output_details()
+        except Exception as e:
+            print(e)
         self.class_number = {3: 'lunge_d', 2: 'lunge_u', 4: 'squat_d', 5: 'squat_u', 8: 'legraise_u', 9: 'legraise_d', 11: 'plank_u', 13: 'sitting_d',
                            15: 'walking_u', 16: 'pushup_u', 17: 'pushup_d', 0: 'none_u'}
         self.detector = pm.poseDetector(
@@ -218,7 +224,11 @@ class VideoTransformTrack2(MediaStreamTrack):
                 pose_row = self.detector.all_classify(img)
                 self.sequence.append(np.array(pose_row))
                 if len(self.sequence) == 3:
-                    res = self.model.predict(np.expand_dims(self.sequence, axis=0))[0]
+                    input_data = np.expand_dims(self.sequence, axis=0)
+                    input_data = np.array(input_data, dtype=np.float32)
+                    self.model.set_tensor(self.input_details[0]['index'], input_data)
+                    self.model.invoke()
+                    res = self.model.get_tensor(self.output_details[0]['index'])[0]
                     self.sequence = self.sequence[1:]
                     self.pose_predict = np.argmax(res)
                     self.pose_prob = res[np.argmax(res)]
