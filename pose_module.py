@@ -102,9 +102,7 @@ class poseDetector:
                     raise Exception
                 # X = pd.DataFrame([pose_row])
                 first = model.predict([pose_row])[0]
-                print(first)
             except Exception as e:
-                print("b")
                 print(e)
             
             img = Image.fromarray(empty_img)
@@ -162,7 +160,6 @@ class poseDetector:
             cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
             cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
             if idxx==11:
-                print("id")
                 return img, status, cnt , start_time    
             else:
                 return img, status, cnt 
