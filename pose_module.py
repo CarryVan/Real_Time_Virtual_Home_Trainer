@@ -100,7 +100,7 @@ class poseDetector:
                 # X = pd.DataFrame([pose_row])
                 first = model.predict([pose_row])[0]
             except Exception as e:
-                pass
+                print(e)
             
             img = Image.fromarray(empty_img)
             img=self.drawTitle(img, "준비 자세를", 45, 3)
