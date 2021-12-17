@@ -84,6 +84,10 @@ var pc = null;
 
 // data channel
 var dc = null, dcInterval = null;
+// var audio = new Audio('../Wow.mp3');
+// var audio = new Audio('C:/Users/o_nag/workspace/Real_Time_Virtual_Home_Trainer/Wow.mp3');
+// audio.play();
+var count=''
 
 function createPeerConnection() {
 		// get DOM elements
@@ -96,7 +100,51 @@ function createPeerConnection() {
 	};
 
 	pc = new RTCPeerConnection(config);
+	// var audioElement=null;
+	// audioElement = new Audio("");
+	// audioElement.addEventListener('ended', function() {
+	// 	this.currentTime = 0;
+	// 	var promise = this.play();
+	// 	if (promise){
+	// 		promise.catch(function(error){
+	// 			console.error(error);
+	// 		});
+	// 	}
+	// }, false);
 
+	// document.body.appendChild(audioElement);
+	// audioElement.src = 'C:/Users/o_nag/workspace/Real_Time_Virtual_Home_Trainer/Wow.mp3';
+	// audioElement.id = "audioElement";
+
+	// audioElement.addEventListener('canplaythrough', function() {
+	// 	audioElement.play();
+	// }, false);
+
+	// audioElement.addEventListener('ended', function() {
+	// 	alert('ended');
+	// }, false);
+
+	// audioElement.onerror = function(event) {
+	//    console.log(event.code);
+	// }
+	var channel = pc.createDataChannel("chat");
+	channel.onopen = function(event) {
+	channel.send('Hi you!');
+	}
+	// var audio = new Audio('Wow.mp3')
+	// audio.loop=false;
+	// audio.play();
+	
+	channel.onmessage = function(event) {
+		count=event.data
+
+		console.log(count)
+		// if(event.data.includes("exit")){
+
+		// 	// stop();
+		// }
+		
+	}
 	// register some listeners to help debugging
 	pc.addEventListener('icegatheringstatechange', function() {
 			iceGatheringLog.textContent += ' -> ' + pc.iceGatheringState;
@@ -143,6 +191,7 @@ function negotiate() {
 					}
 			});
 	}).then(function() {
+			// console.log("offer")
 			var offer = pc.localDescription;
 			return fetch('/offer', {
 				body: JSON.stringify({
@@ -297,4 +346,7 @@ function escapeRegExp(string) {
 
 function stop(){
 	location.href = "record.html";
+	console.log("b")
+	console.log(count)
+	console.log("A")
 }
