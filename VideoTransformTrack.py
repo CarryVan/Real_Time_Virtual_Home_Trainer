@@ -139,8 +139,6 @@ class VideoTransformTrack(MediaStreamTrack):
                         self.flow = 4
                         self.breaktime = self.breaktime_list[self.i]
                     
-
-
                 if self.flow == 4 and time.time()-self.break_time < self.breaktime:
                     img = self.detector.title(img, "BREAK TIME", str(
                         self.breaktime-int(time.time()-self.break_time)))
@@ -269,7 +267,7 @@ class VideoTransformTrack2(MediaStreamTrack):
             new_frame = VideoFrame.from_ndarray(img, format="bgr24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
-            self.before_frame = new_frame
+            # self.before_frame = new_frame
             return new_frame
             
         except Exception as e:
