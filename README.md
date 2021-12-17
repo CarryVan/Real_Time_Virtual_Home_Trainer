@@ -1,18 +1,28 @@
-"# pose_estimation_local" 
+"# Real-Time Virtual Home Trainer Dev" 
 
-## 환경 설정
+## Dev 세팅
+
+docker 로 https 서버 세팅
+
+```bash
+docker-compose up -d
 ```
-conda create -n {name} python=3.8
-conda activate {name}
-pip install -r requirments.txt
+서버 중지
+
+```bash
+docker-compose stop
 ```
 
-## START
-```
-python server.py
+서버 시작
+
+```bash
+docker-compose start
 ```
 
-## 접속
-```
-127.0.0.1:{port}
-```
+## 접속 IP 주소 
+
+로컬 80번 포트와 docker 80번 포트가 바인딩 되어있음
+
+-> https://127.0.0.1:80 
+
+-> https://{IPv4 Address}:80

@@ -50,12 +50,13 @@ function addList(){
 	parent.lastChild.lastChild.appendChild(time);
 	}
 
-	exercises = ['운동선택', 'pushup', 'plank', 'squat', 'legraise', 'lunge'];
+	// TODO 운동선택 없이 선택시 오류 발생 , 우선 운동선택 제외함
+	exercises = ['pushup', 'plank', 'squat', 'legraise', 'lunge'];
 	btn1.setAttribute('class', 'exercise')
-	for(var i=0; i<=exercises.length; i++){
+	for(var i=0; i<exercises.length; i++){
 		const option = document.createElement("option");
 		const text = document.createTextNode(exercises[i]);
-		option.setAttribute('value',exercise[i])
+		option.setAttribute('value',exercises[i])
 		option.appendChild(text);
 		btn1.appendChild(option);
 	}
@@ -114,10 +115,10 @@ function createPeerConnection() {
 
 	// connect audio / video
 	pc.addEventListener('track', function(evt) {
-			if (evt.track.kind == 'video')
-					document.getElementById('video').srcObject = evt.streams[0];
-			else
-					document.getElementById('audio').srcObject = evt.streams[0];
+		if (evt.track.kind == 'video')
+				document.getElementById('video').srcObject = evt.streams[0];
+		else
+				document.getElementById('audio').srcObject = evt.streams[0];
 	});
 
 	return pc;
@@ -192,11 +193,6 @@ function start() {
 		breaktime_list.push(breaktimes[i].value)
 	}
 
-	console.log(exercise_list)
-	console.log(cnt_list)
-	console.log(set_list)
-
-	console.log(breaktime_list)
 	localStorage.setItem("exercise", exercise_list)
 	localStorage.setItem("cnt", cnt_list)
 	localStorage.setItem("set", set_list)
