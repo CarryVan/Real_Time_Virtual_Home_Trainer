@@ -28,25 +28,32 @@
         <div class="mylogo" style="cursor: pointer">
           <p>CarryVan</p><img src="./img/logo.png" />
         </div>
+        <div class="nav-links">
+          Record
+        </div>
       </nav>
     </header>
 
     <main>
-
       <section class="home">
         <div class="cover">
           <div class="title">
             Virtual Home Trainer
           </div>
-        </div>
+          <div class ="start">
+            <div class = "button" onclick="location.href='schedule.html'">
+              <div class="text_start">LIVE MODE</div>
+              <img src="./img/start.png" />
+            </div>
+            <div class = "button" onclick="location.href='schedule.html'">
+              <div class="text_start">SCHEDULE MODE</div>
+              <img src="./img/start.png" />
+            </div>
+          </div>
+        </div>  
       </section>
-      
-      <div class="start">
-        <button onclick="location.href='schedule.html'">
-          START
-        </button>
-      </div>
     </main>
   </body>
   <script src="static/client.js"></script>
+  <script src="event.js"></script>
 </html>

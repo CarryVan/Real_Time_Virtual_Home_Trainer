@@ -328,7 +328,6 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
 
     crud.save_workout_session(db)
 
-    print(f"params: {params}")
     for i in range(tot_len):
         index = i//2
         sw = SaveWorkout
@@ -368,10 +367,4 @@ if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
                 port=8080,
-<<<<<<< HEAD
                 reload=True)
-=======
-                ssl_keyfile="./localhost+2-key.pem",
-                ssl_certfile="./localhost+2.pem",
-                reload=True)
->>>>>>> 0b71ded141fefd12235caac035ed80f98c4aba6b

@@ -30,8 +30,16 @@
   <script>
   function load(){
 
-    const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "localhost:8080/")
+    fetch("/data", {
+      method: "POST",
+      headers: {
+        'Content-Type' : 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(data => {
+      console.log(data);
+    });
 
   }
   </script>
