@@ -189,14 +189,17 @@ class VideoTransformTrack2(MediaStreamTrack):
         super().__init__()  # don't forget this!
         self.track = track
         try:
-            self.model = tf.lite.Interpreter(model_path="./model/all_model/model.tflite")
+            # self.model = models.load_model('./model/all4_model')
+
+            self.model = tf.lite.Interpreter(model_path="./model/all4_model/all4_model.tflite")
             self.model.allocate_tensors()
             self.input_details = self.model.get_input_details()
             self.output_details = self.model.get_output_details()
         except Exception as e:
             print(e)
-        self.class_number = {3: 'lunge_d', 2: 'lunge_u', 4: 'squat_d', 5: 'squat_u', 8: 'legraise_u', 9: 'legraise_d', 11: 'plank_u', 13: 'sitting_d',
-                           15: 'walking_u', 16: 'pushup_u', 17: 'pushup_d', 0: 'none_u'}
+        self.class_number = {2: 'dumbbell_u', 3: 'dumbbell_d', 6: 'legraise_u', 7: 'legraise_d', 10: 'lunge_d', 11: 'lunge_u', 13: 'plank_u', 16: 'pushup_d', 17: 'pushup_u', 
+        20: 'situp_u', 21: 'situp_d', 24: 'squat_d', 25: 'squat_u', 27: 'walking_u', 0: 'none_u'}
+                           
         self.detector = pm.poseDetector(
             model_dir='./model/all_model/body_language_mlp.pkl')
         self.sequence = []
@@ -207,64 +210,90 @@ class VideoTransformTrack2(MediaStreamTrack):
         self.pose_prob = 0
         self.plank_cnt = 0
         self.plank_start_time = 0
-        self.workout_cnt = {'lunge': 0, 'squat': 0, 'legraise': 0, 'plank': 0, 'pushup': 0}
-
+        self.workout_cnt = {'lunge': 0, 'squat': 0, 'legraise': 0, 'plank': 0, 'pushup': 0, 'situp' : 0, 'dumbbell' : 0}
+        self.workout = {'lunge': -40, 'squat': -40, 'legraise': -40, 'plank': -40, 'pushup': -40, 'situp' : -40, 'dumbbell' : -40}
+        self.key  = ['lunge', 'squat', 'legraise', 'plank', 'pushup', 'situp', 'dumbbell']
+        self.cnt = 0
+        
+        
     async def recv(self):
-        self.drop += 1
-        frame = await self.track.recv()
-        img = frame.to_ndarray(format="bgr24")
-        
-        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        img = cv2.flip(img, 0)
-        
-        if self.drop % 4 == 0:
-            pose_row = self.detector.all_classify(img)
-            self.sequence.append(np.array(pose_row))
-            if len(self.sequence) == 3:
-                input_data = np.expand_dims(self.sequence, axis=0)
-                input_data = np.array(input_data, dtype=np.float32)
-                self.model.set_tensor(self.input_details[0]['index'], input_data)
-                self.model.invoke()
-                res = self.model.get_tensor(self.output_details[0]['index'])[0]
-                self.sequence = self.sequence[1:]
-                self.pose_predict = np.argmax(res)
-                self.pose_prob = res[np.argmax(res)]
+        try:
+            
+            self.drop += 1
+            frame = await self.track.recv()
+            img = frame.to_ndarray(format="bgr24")
+            
+            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            img = cv2.flip(img, 0)
+            
+            if self.drop % 4 == 0:
+                self.drop = 0
+                pose_row = self.detector.all_classify(img)
+                self.sequence.append(np.array(pose_row))
+                if len(self.sequence) == 3:
+                    input_data = np.expand_dims(self.sequence, axis=0)
+                    input_data = np.array(input_data, dtype=np.float32)
+                    self.model.set_tensor(self.input_details[0]['index'], input_data)
+                    self.model.invoke()
+                    res = self.model.get_tensor(self.output_details[0]['index'])[0]
+                    
+                
+                    # res = self.model.predict(np.expand_dims(self.sequence, axis=0))[0]
+                    self.sequence = self.sequence[1:]
+                    self.pose_predict = np.argmax(res)
+                    self.pose_prob = res[np.argmax(res)]
+                    
 
-            self.status = self.class_number[self.pose_predict].split("_")
+                self.status = self.class_number[self.pose_predict].split("_")
+                
+                if self.status[0] != "plank" and self.status[0] == self.before_status[0] and self.before_status[1] == "d" and self.status[1] == "u":
+                    self.workout_cnt[self.status[0]] += 1
+                
+                if self.status[0] != 'plank':
+                    self.plank_start_time = 0
+                
+                elif self.status[0] == "plank":
+                    if not self.plank_start_time:
+                        self.plank_start_time = time.time()
+                    self.plank_time = time.time()
+                    if int(self.plank_time - self.plank_start_time) >= 1:
+                        self.workout_cnt[self.status[0]] += int(self.plank_time - self.plank_start_time)
+                        self.plank_start_time = self.plank_time
+                self.before_status = self.status
             
-            if self.status[0] != "plank" and self.status[0] == self.before_status[0] and self.before_status[1] == "d" and self.status[1] == "u":
-                self.workout_cnt[self.status[0]] += 1
             
-            if self.status[0] != 'plank':
-                self.plank_start_time = 0
-            
-            elif self.status[0] == "plank":
-                if not self.plank_start_time:
-                    self.plank_start_time = time.time()
-                self.plank_time = time.time()
-                if int(self.plank_time - self.plank_start_time) >= 1:
-                    self.workout_cnt[self.status[0]] += int(self.plank_time - self.plank_start_time)
-                    self.plank_start_time = self.plank_time
-            self.before_status = self.status
-            
-        cv2.putText(img, self.class_number[self.pose_predict], (30, 30), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)    
-        cv2.putText(img, str(round(self.pose_prob, 2)), (330, 30), 
+            for i in self.key:
+                if self.workout_cnt[i] != 0:
+                    self.cnt += 30
+                    self.workout[i] = self.cnt
+                    self.key.remove(i)
+                    
+                    
+            cv2.putText(img, self.class_number[self.pose_predict], (300, 30), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)    
+          
+
+            cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, self.workout['pushup']), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+            cv2.putText(img, 'lunge' + str(self.workout_cnt['lunge']), (30, self.workout['lunge']), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+            cv2.putText(img, 'plank' + str(self.workout_cnt['plank']), (30, self.workout['plank']), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+            cv2.putText(img, 'squat' + str(self.workout_cnt['squat']), (30, self.workout['squat']), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+            cv2.putText(img, 'legraise' + str(self.workout_cnt['legraise']), (30, self.workout['legraise']), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+            cv2.putText(img, 'situp' + str(self.workout_cnt['situp']), (30, self.workout['situp']), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+            cv2.putText(img, 'dumbbell' + str(self.workout_cnt['dumbbell']), (30, self.workout['dumbbell']), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
 
-        cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, 270), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-        cv2.putText(img, 'lunge' + str(self.workout_cnt['lunge']), (30, 110), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-        cv2.putText(img, 'plank' + str(self.workout_cnt['plank']), (30, 150), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-        cv2.putText(img, 'squat' + str(self.workout_cnt['squat']), (30, 190), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-        cv2.putText(img, 'legraise' + str(self.workout_cnt['legraise']), (30, 230), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
 
-        new_frame = VideoFrame.from_ndarray(img, format="bgr24")
-        new_frame.pts = frame.pts
-        new_frame.time_base = frame.time_base
-        # self.before_frame = new_frame
-        return new_frame
+            new_frame = VideoFrame.from_ndarray(img, format="bgr24")
+            new_frame.pts = frame.pts
+            new_frame.time_base = frame.time_base
+            # self.before_frame = new_frame
+            return new_frame
+        except Exception as e:
+            
+            print(e)
