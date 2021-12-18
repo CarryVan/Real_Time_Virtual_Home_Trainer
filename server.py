@@ -102,7 +102,7 @@ async def offer(params: Offer):
                 track, exercise_list=params.exercise, cnt_list=params.cnt, set_list=params.set, breaktime_list=params.breaktime
             )
             pc.addTrack(local_video)
-
+            recorder.addTrack(track)
         @track.on("ended")
         async def on_ended():
             await recorder.stop()
@@ -152,6 +152,7 @@ async def offer(params: Live):
         elif track.kind == "video":
             local_video = VideoTransformTrack2(track)
             pc.addTrack(local_video)
+            recorder.addTrack(track)
 
         @track.on("ended")
         async def on_ended():
