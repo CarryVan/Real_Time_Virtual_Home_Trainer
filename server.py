@@ -19,8 +19,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from VideoTransformTrack import VideoTransformTrack, AudioTransformTrack
-from src.schemas import Offer
+from VideoTransformTrack import VideoTransformTrack, AudioTransformTrack, VideoTransformTrack2
+from src.schemas import Offer, Live
 ROOT = os.path.dirname(__file__)
 
 app = FastAPI()
@@ -59,6 +59,12 @@ async def start(request: Request):
     content = open(os.path.join(ROOT, f"templates/start.html"),
                    "r", encoding='UTF8').read()
     return templates.TemplateResponse("start.html", {"request": request})
+
+@app.get("/live.html", response_class=HTMLResponse)
+async def live(request: Request):
+    content = open(os.path.join(ROOT, f"templates/live.html"),
+                   "r", encoding='UTF8').read()
+    return templates.TemplateResponse("live.html", {"request": request})
 
 @app.post("/offer")
 async def offer(params: Offer):
@@ -112,7 +118,56 @@ async def offer(params: Offer):
 
     return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
 
+@app.post("/offer2")
+async def offer(params: Live):
+    offer = RTCSessionDescription(sdp=params.sdp, type=params.type)
 
+    pc = RTCPeerConnection()
+    pc_id = "PeerConnection(%s)" % uuid.uuid4()
+    pcs.add(pc)
+
+    # prepare local media
+    player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
+    recorder = MediaBlackhole()
+
+    @pc.on("datachannel")
+    def on_datachannel(channel):
+        @channel.on("message")
+        def on_message(message):
+            if isinstance(message, str) and message.startswith("ping"):
+                channel.send("pong" + message[4:])
+
+    @pc.on("iceconnectionstatechange")
+    async def on_iceconnectionstatechange():
+        if pc.iceConnectionState == "failed":
+            await pc.close()
+            pcs.discard(pc)
+
+    @pc.on("track")
+    def on_track(track):
+        if track.kind == "audio":
+            local_audio = AudioTransformTrack(track)
+            # pc.addTrack(local_audio) 
+            # recorder.addTrack(track)   
+        elif track.kind == "video":
+            local_video = VideoTransformTrack2(track)
+            pc.addTrack(local_video)
+
+        @track.on("ended")
+        async def on_ended():
+            await recorder.stop()
+            await pc.close()
+
+    # handle offer
+    await pc.setRemoteDescription(offer)
+    await recorder.start()
+
+    # send answer
+    answer = await pc.createAnswer()
+    await pc.setLocalDescription(answer)
+
+    return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
+    
 async def on_shutdown(app):
     # close peer connections
     coros = [pc.close() for pc in pcs]

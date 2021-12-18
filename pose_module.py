@@ -35,6 +35,7 @@ class poseDetector:
                                     self.min_tracking_confidence)
         self.status = 'pushup_x'
         self.joint = [8, 0, 7, 9, 10, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+        self.joint2 = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]
         # with open(f'{model_dir}', 'rb') as f:
             # self.model = pickle.load(f)
 
@@ -189,6 +190,11 @@ class poseDetector:
         pad=int(height*0.85)
         cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
         return img
+
+    def all_classify(self, img):
+        results = self.pose.process(img)
+        pose_row = np.array([[res.x, res.y, res.z, res.visibility] for idx, res in enumerate(results.pose_landmarks.landmark) if idx in self.joint2]).flatten() if results.pose_landmarks else np.zeros(48)
+        return pose_row
    
 
 
