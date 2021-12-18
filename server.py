@@ -350,11 +350,19 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     
     return "saved!"
     
-@app.post("/recent_workout", response_model=List[schemas.WorkoutFlow])
-async def recent_workout(db: Session = Depends(get_db)):
+#response_model=List[schemas.WorkoutFlow]
+@app.post("/workout_data")
+async def recent_workouts(db: Session = Depends(get_db)):
 
-    most_recent = crud.get_recent_session(db)
-    print(most_recent)
+    most_recents = crud.get_recent_sessions(db)
+    return_list = []
+
+    for session in most_recents:
+
+       workout_flow = crud.get_workout_flows_by_id(db, session.id)
+       return_list.append(workout_flow)
+
+    return return_list
 
 async def on_shutdown(app):
     # close peer connections

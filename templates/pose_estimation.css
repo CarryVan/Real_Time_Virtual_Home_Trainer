@@ -198,6 +198,55 @@ nav .hamburger {
     font-size: 2em;
     color: rgba(255, 255, 255, 0.8)
   }
+
+  .home .record_page{
+    height:80%;
+    width:80%;
+    background-color:rgba(0, 0, 0, 0.95);
+    
+    display: flex;
+    flex-direction: column;
+    justify-content:baseline;
+    align-items:flex-start;
+  }
+
+  .home .record_page .card{
+    background-color:rgba(255, 255, 255, 0.9);
+    border-radius: 5%;;
+    height:25%;
+    width:100%;
+    border: 1px solid black;
+    margin-bottom: 2vh;
+
+    display:flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .inner{
+    height: 80%;
+    width: 80%;
+
+    display:flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .inner .title{
+    width:30%;
+    height:100%;
+  }
+
+  .inner .line{
+    width:1%;
+    height:100%;
+    background-color: rgba(0, 0, 0, 0.7)
+  }
+
+  .inner .workout{
+    height:100%;
+    width:60%;
+  }
 }
 
 .product{
