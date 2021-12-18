@@ -44,6 +44,7 @@ def get_db():
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/img", StaticFiles(directory="img"), name="img")
 templates = Jinja2Templates(directory="templates")
 
 logger = logging.getLogger("pc")
@@ -246,6 +247,12 @@ async def record(request: Request):
                    "r", encoding='UTF8').read()
     return templates.TemplateResponse("record.html", {"request": request})
 
+@app.get("/pose_estimation.html", response_class=HTMLResponse)
+async def record(request: Request):
+    content = open(os.path.join(ROOT, f"templates/pose_estimation.html"),
+                   "r", encoding='UTF8').read()
+    return templates.TemplateResponse("pose_estimation.html", {"request": request})
+
 @app.get("/start.html", response_class=HTMLResponse)
 async def start(request: Request):
     content = open(os.path.join(ROOT, f"templates/start.html"),
@@ -360,6 +367,7 @@ async def recent_workouts(db: Session = Depends(get_db)):
     for session in most_recents:
 
        workout_flow = crud.get_workout_flows_by_id(db, session.id)
+       workout_flow.insert(0, session.date_time)
        return_list.append(workout_flow)
 
     return return_list

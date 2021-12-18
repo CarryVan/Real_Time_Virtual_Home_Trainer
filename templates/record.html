@@ -4,12 +4,12 @@
     <meta charset="UTF-8"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" type="text/css" href="pose_estimation.css">
+    <link rel="stylesheet" type="text/css" href="static/pose_estimation.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
   </head>
-  <body>
+  <body onload="load()">
     <header>
       <nav>
         <div class="hamburger">
@@ -17,46 +17,71 @@
           <div class="line"></div>
           <div class="line"></div>
         </div>
-        <div class="mylogo" style="cursor: pointer">
+        <div class="mylogo" style="cursor: pointer" onclick="location.href='pose_estimation.html'">
           <p>CarryVan</p><img src="./img/logo.png" />
         </div>
-        <div class="nav-links">
+        <ul class="nav-links" onclick="location.href='record.html'">
           Record
-        </div>
+        <ul>
       </nav>
     </header>
 
     <main>
       <section class="home">
-        <div id="frame" class="record_page">
-          
+        <div id="frame" class="record_page" >
           <div class="card">
             <div class="inner">
-              <div class="title"></div>
+              <div class="date">
+                <div id="t_11" class="title"></div>
+                <div id="t_12" class="dw"></div>
+              </div>
               <div class="line"></div>
-              <div class="workout"></div>
+              <div class="workout">
+                <ul id = "w_1">
+                </ul>
+              </div>
             </div>
           </div>
           <div class="card">
             <div class="inner">
-              <div class="title"></div>
+              <div class="date">
+                <div id="t_21" class="title"></div>
+                <div id="t_22" class="dw"></div>
+              </div>
               <div class="line"></div>
-              <div class="workout"></div>
+              <div class="workout">
+                <ul id = "w_2">
+                </ul>
+              </div>
             </div>
           </div>
           <div class="card">
             <div class="inner">
-              <div class="title"></div>
+              <div class="date">
+                <div id="t_31" class="title"></div>
+                <div id="t_32" class="dw"></div>
+              </div>
               <div class="line"></div>
-              <div class="workout"></div>
+              <div class="workout">
+                <ul id = "w_3">
+                </ul>
+              </div>
             </div>
           </div>
-
         </div>   
       </section>
     </main>
   </body>
   <script>
+    function getDate(date_time){
+
+      var week = ["Sun", "Mon", "Tue", "Wed", "Tur", "Fri", "Sat"];
+
+      var dayOfWeek = week[new Date(date_time).getDay()]; 
+
+      return dayOfWeek;
+    }
+
     function load(){
       
       fetch("/workout_data", {
@@ -68,21 +93,46 @@
       .then(response => response.json())
       .then(data => {
         
-        var p = document.geteElementById("frame");
-        var titleDIV = document.createElement("div");
-        
+        console.log(data)
+        for (var i = 0; i < data.length; i++){
+          
+          var t1 = document.getElementById("t_".concat(String(i+1), "1"))
+          var t2 = document.getElementById("t_".concat(String(i+1), "2"))
+          var w = document.getElementById("w_".concat(String(i+1)))
 
-        titleDIV.innerHTML = "오늘의 workout";
-        
-        for (var i = 0; i < data[0].length; i++){
-
-          for (var j = 0; j < data[0][i].length; j++){
-              var w_li = document.createElement("li");
+          date_time = data[i][0]
+          console.log(date_time)
+          for (var j = 0; j < date_time.length; j++){
+            if (date_time[j] == "T"){
+              date_time = date_time.slice(5, j)
+            }
           }
-         
 
+          var li = []
+
+          for (var j = 1; j < data[i].length; j++){
+            var pt = data[i][j];
+            var li = document.createElement("li");
+            var temp = ""
+            if (pt.workout_name == "break"){
+              temp = "BREAK"+"  " + pt.breaktime +"sec";
+            } else{
+              temp = pt.workout_name.toUpperCase()+"  "+pt.count+"  "+pt.set;
+            }
+
+            const textNode = document.createTextNode(temp);
+            li.appendChild(textNode);
+            w.appendChild(li)
+          }
+          dw=getDate(date_time)
+          t1.innerHTML = date_time
+          t2.innerHTML = dw
         }
-
+        
+      //  for (var j = 0; j < data[0][i].length; j++){
+       //   var w_li = document.createElement("li");
+      //}
+     
       });
     }
 
@@ -99,5 +149,5 @@
     }
   </script>
   
-  <script src="event.js"></script>
+  <script src="static/event.js"></script>
 </html>

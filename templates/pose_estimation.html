@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" type="text/css" href="pose_estimation.css">
+    <link rel="stylesheet" type="text/css" href="./static/pose_estimation.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
@@ -25,12 +25,12 @@
           <div class="line"></div>
           <div class="line"></div>
         </div>
-        <div class="mylogo" style="cursor: pointer">
+        <div class="mylogo" style="cursor: pointer" onclick="location.href='pose_estimation.html'">
           <p>CarryVan</p><img src="./img/logo.png" />
         </div>
-        <div class="nav-links">
+        <ul class="nav-links" onclick="location.href='record.html'">
           Record
-        </div>
+        <ul>
       </nav>
     </header>
 
@@ -41,19 +41,19 @@
             Virtual Home Trainer
           </div>
           <div class ="start">
-            <div class = "button" onclick="location.href='schedule.html'">
+            <div class = "button" >
               <div class="text_start">LIVE MODE</div>
-              <img src="./img/start.png" />
+              <img src="./img/start.png" onclick="location.href='schedule.html'"/>
             </div>
             <div class = "button" onclick="location.href='schedule.html'">
               <div class="text_start">SCHEDULE MODE</div>
-              <img src="./img/start.png" />
+              <img src="./img/start.png" onclick="location.href='schedule.html'" />
             </div>
           </div>
         </div>  
       </section>
     </main>
   </body>
-  <script src="static/client.js"></script>
-  <script src="event.js"></script>
+  <script src="./static/client.js"></script>
+  <script src="./static/event.js"></script>
 </html>
