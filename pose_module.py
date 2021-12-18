@@ -34,7 +34,7 @@ class poseDetector:
                                     self.min_detection_confidence,
                                     self.min_tracking_confidence)
         self.status = 'pushup_x'
-        self.joint = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]
+        self.joint = [8, 0, 7, 9, 10, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
         # with open(f'{model_dir}', 'rb') as f:
             # self.model = pickle.load(f)
 
@@ -42,9 +42,6 @@ class poseDetector:
     def drawTitle(self,img,title,size,y):
         
         width,height=img.size
-        # height,width=img.size
-        # print(height,width)
-        # print(type(img))
         try: 
             draw = ImageDraw.Draw(img)
             font=ImageFont.truetype("font/GodoM.ttf",size)
@@ -63,7 +60,7 @@ class poseDetector:
                 org=((width-w*2.5),(h))
             draw.text(org,text,font=font,fill=(255,255,255))
         except Exception as e:
-            print(e)
+            pass
         return img
     def title(self, img,title,plus):
         img.flags.writeable = True
@@ -72,7 +69,7 @@ class poseDetector:
             img = self.drawTitle(img,title,85,0)
             img=self.drawTitle(img, plus, 85, 1)
         except Exception as e:
-            print(e)
+            pass
         img = np.array(img)
         return img
 
@@ -97,7 +94,7 @@ class poseDetector:
                 if psland!= None:
                     landmarks = psland.landmark
                 joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
-                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
                 if len(joint_cnt) < 5:
                     raise Exception
                 # X = pd.DataFrame([pose_row])
@@ -109,7 +106,7 @@ class poseDetector:
             img=self.drawTitle(img, "준비 자세를", 45, 3)
             img=self.drawTitle(img, "취해주세요" , 45, 4)
         except Exception as e:
-            print(e)
+            pass
 
         img = np.array(img)
         return img,first
@@ -129,7 +126,7 @@ class poseDetector:
             
             landmarks = results.pose_landmarks.landmark
             joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
-            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
                 
             # X = pd.DataFrame([pose_row])
             body_language_class = model.predict([pose_row])[0]
@@ -165,7 +162,6 @@ class poseDetector:
                 return img, status, cnt 
             
         except Exception as e:
-            print(e)
             try:
                 img = Image.fromarray(empty_img)
                 self.drawTitle(img, str(cnt) , 65, 5)
@@ -173,7 +169,7 @@ class poseDetector:
                 cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
                 cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
             except Exception as e:
-                print(e)
+                pass
             if idxx==11:
                 return img, status, cnt , start_time    
             else:
@@ -186,7 +182,7 @@ class poseDetector:
             self.drawTitle(img, str(cnt) , 65, 5)
             img = np.array(img)
         except Exception as e:
-            print(e)
+            pass
         prog=int(width*0.9)
 
         margin=int(width*0.1)
