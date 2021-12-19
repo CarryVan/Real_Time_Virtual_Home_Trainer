@@ -82,6 +82,10 @@ var pc = null;
 
 // data channel
 var dc = null, dcInterval = null;
+// var audio = new Audio('../Wow.mp3');
+// var audio = new Audio('C:/Users/o_nag/workspace/Real_Time_Virtual_Home_Trainer/Wow.mp3');
+// audio.play();
+var count=''
 
 function createPeerConnection() {
 		// get DOM elements
@@ -94,7 +98,21 @@ function createPeerConnection() {
 	};
 
 	pc = new RTCPeerConnection(config);
-
+	
+	var channel = pc.createDataChannel("chat");
+	channel.onopen = function(event) {
+	channel.send('Hi you!');
+	}
+	
+	channel.onmessage = function(event) {
+		count=event.data
+		localStorage.setItem("count",count)
+		console.log(count)
+		if(event.data.includes("exit")){
+			stop();
+		}
+		
+	}
 	// register some listeners to help debugging
 	pc.addEventListener('icegatheringstatechange', function() {
 			iceGatheringLog.textContent += ' -> ' + pc.iceGatheringState;
@@ -141,6 +159,7 @@ function negotiate() {
 					}
 			});
 	}).then(function() {
+			// console.log("offer")
 			var offer = pc.localDescription;
 			return fetch('/offer', {
 				body: JSON.stringify({
@@ -295,7 +314,9 @@ function sdpFilterCodec(kind, codec, realSdp) {
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
-
+function schedule(){
+	console.log(localStorage.getItem("count"))
+}
 function stop(){
 
 	fetch("/save_workout", {
@@ -314,4 +335,5 @@ function stop(){
 	.then(data => console.log(data))
 	
 	location.href = "record.html";
+	alert(count)
 }

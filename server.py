@@ -4,9 +4,13 @@ import os
 import uuid
 import time
 import pickle
+<<<<<<< HEAD
 import sys
 from datetime import datetime
 
+=======
+import json
+>>>>>>> a2d3878b7d4cfa988e15b6a10308240b6f5f26d5
 import cv2
 import pose_module as pm
 # from aiohttp import web
@@ -21,6 +25,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+<<<<<<< HEAD
 #database
 sys.path.append('./database')
 import crud, models, schemas
@@ -30,6 +35,10 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from src.schemas import Offer, Info
+=======
+from src.schemas import Offer
+
+>>>>>>> a2d3878b7d4cfa988e15b6a10308240b6f5f26d5
 ROOT = os.path.dirname(__file__)
 
 #database connection
@@ -54,21 +63,22 @@ class AudioTransformTrack(MediaStreamTrack):
     kind = "audio"
 
     def __init__(self, track):
+        print("init")
         super().__init__()  # don't forget this!
         self.track = track
 
     async def recv(self):
         audio = await self.track.recv()
-        # player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
-        # audio = player.audio
-        return audio
+        player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
+        myaudio = player.audio
+        return myaudio
 
 class VideoTransformTrack(MediaStreamTrack):
     """
     A video stream track that transforms frames from an another track.
     """
     kind = "video"
-    def __init__(self, track, exercise_list, cnt_list, set_list, breaktime_list):
+    def __init__(self,track, exercise_list, cnt_list, set_list, breaktime_list):
         super().__init__()  # don't forget this!
         self.track = track
         self.detector = pm.poseDetector(
@@ -78,6 +88,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.drop = -1
         self.set_list = list(map(int,set_list.split(",")))
         self.pre_set=1
+        self.total_set=1
         if breaktime_list != '':
             self.breaktime_list = list(map(int, breaktime_list.split(",")))
         else:
@@ -109,11 +120,16 @@ class VideoTransformTrack(MediaStreamTrack):
 
         self.label_d=""
         self.label_u=""
+<<<<<<< HEAD
 
+=======
+        self.channel=None
+        self.progress={}
+>>>>>>> a2d3878b7d4cfa988e15b6a10308240b6f5f26d5
     async def recv(self):
         self.drop += 1
         frame = await self.track.recv()
-        if self.drop % 3 == 0:
+        if self.drop % 4 == 0:
             self.drop = 0
             # pose estimate
             img = frame.to_ndarray(format="bgr24")
@@ -141,7 +157,15 @@ class VideoTransformTrack(MediaStreamTrack):
                         self.label_d=self.label_u
                         self.label_u=temp
                     self.flow = 0
-
+                    try:
+                        if self.sports not in self.progress:
+                            self.progress[self.sports]=[0]*self.set_list[self.i]
+                        elif self.sports in self.progress and self.pre_set==1:
+                            prelen=len(self.progress[self.sports])
+                            self.progress[self.sports].extend([0]*self.set_list[self.i])
+                            self.total_set=prelen+1
+                    except Exception as e:
+                        print(e)
                 if self.flow == 0 and time.time()-self.start_time < self.time:
                     img = self.detector.title(
                         img, self.SPORTS, str(self.cnt_list[self.i]))
@@ -151,6 +175,7 @@ class VideoTransformTrack(MediaStreamTrack):
                 if self.flow == 1 and self.posture != self.preposture:
                     img, self.posture = self.detector.set_posture(
                         img, self.idxx, self.model, "None",self.preposture, f'./dataset/example/{self.sports}.JPG', 200)
+                    
                 elif self.flow == 1 and self.posture == self.preposture:
                     self.flow = 2
                 
@@ -163,6 +188,10 @@ class VideoTransformTrack(MediaStreamTrack):
                         img, self.status, self.cnt = self.detector.exercise(
                             img, self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i])
                         self.finish_time = time.time()
+                    if self.sports in self.progress:
+                        self.progress[self.sports][self.total_set-1]=self.cnt
+                    else:
+                        print("none")
                 elif self.flow == 2 and self.cnt >= self.goal[self.i]:
                     self.flow = 3
                 
@@ -203,25 +232,35 @@ class VideoTransformTrack(MediaStreamTrack):
                         with open(f'./model/{str(self.exercise_list[self.i])}_model/body_language_lr.pkl', 'rb') as f:
                             self.model = pickle.load(f)
                         self.pre_set=1
+                        self.total_set=1
                         self.idxx=10
                     else:
                         self.pre_set+=1
+                        self.total_set+=1
                     self.flow = -1
                     self.posture = "None"
                     self.cnt = 0
-                if self.flow == 6:
-                    img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
+                # if self.flow == 6:
+                    # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
                         
-                # if self.flow == 6 and time.time()-self.goodjob_time < self.time+8:
-                #     img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
+                if self.flow == 6 and time.time()-self.goodjob_time < self.time:
+                    img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
 
-                # elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
-                #     pass
+                elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
+                    self.progress['exit']=1
 
             new_frame = VideoFrame.from_ndarray(img, format="bgr24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
             self.before_frame = new_frame
+            try:
+                if self.channel is not None and (self.flow==2 or self.flow==6):
+                    self.channel.send(
+                        json.dumps(self.progress)
+                    )
+            except Exception as e:
+                print(e)
+            
             return new_frame
         else:
             return self.before_frame
@@ -262,22 +301,15 @@ async def start(request: Request):
 @app.post("/offer")
 async def offer(params: Offer):
     offer = RTCSessionDescription(sdp=params.sdp, type=params.type)
-
     pc = RTCPeerConnection()
     
 
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
-
-    # prepare local media
+    pcs.add(pc)
+    
     player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
     recorder = MediaBlackhole()
-
-    @pc.on("datachannel")
-    def on_datachannel(channel):
-        @channel.on("message")
-        def on_message(message):
-            if isinstance(message, str) and message.startswith("ping"):
-                channel.send("pong" + message[4:])
+    
 
     @pc.on("iceconnectionstatechange")
     async def on_iceconnectionstatechange():
@@ -288,15 +320,21 @@ async def offer(params: Offer):
     @pc.on("track")
     def on_track(track):
         if track.kind == "audio":
-            local_audio = AudioTransformTrack(track)
+            # pass
+            pc.addTrack(player.audio)
+            recorder.addTrack(track)
+
+            # local_audio = AudioTransformTrack(track)
             # pc.addTrack(local_audio) 
-            # recorder.addTrack(track)   
+            # recorder.addTrack(local_audio)
+            # pc.addTrack(local_audio)   
         elif track.kind == "video":
+            global local_video
             local_video = VideoTransformTrack(
                 track, exercise_list=params.exercise, cnt_list=params.cnt, set_list=params.set, breaktime_list=params.breaktime
             )
             pc.addTrack(local_video)
-        
+            recorder.addTrack(track)
 
         @track.on("ended")
         async def on_ended():
@@ -306,7 +344,15 @@ async def offer(params: Offer):
             await asyncio.gather(*coros)
             pcs.clear()
 
-
+    @pc.on("datachannel")
+    def on_datachannel(channel):
+        global local_video
+        local_video.channel=channel
+        @channel.on("message")
+        def on_message(message):
+            # if isinstance(message, str) and message.startswith("ping"):
+            #     channel.send("pong" + message[4:])
+            channel.send("mgs")
     # handle offer
     await pc.setRemoteDescription(offer)
     await recorder.start()
