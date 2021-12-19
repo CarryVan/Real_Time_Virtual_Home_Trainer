@@ -191,14 +191,14 @@ class VideoTransformTrack2(MediaStreamTrack):
         try:
             # self.model = models.load_model('./model/all4_model')
 
-            self.model = tf.lite.Interpreter(model_path="./model/all4_model/all4_model.tflite")
+            self.model = tf.lite.Interpreter(model_path="./model/all6_model/all6_model.tflite")
             self.model.allocate_tensors()
             self.input_details = self.model.get_input_details()
             self.output_details = self.model.get_output_details()
         except Exception as e:
             print(e)
-        self.class_number = {2: 'dumbbell_u', 3: 'dumbbell_d', 6: 'legraise_u', 7: 'legraise_d', 10: 'lunge_d', 11: 'lunge_u', 13: 'plank_u', 16: 'pushup_d', 17: 'pushup_u', 
-        20: 'situp_u', 21: 'situp_d', 24: 'squat_d', 25: 'squat_u', 27: 'walking_u', 0: 'none_u'}
+        self.class_number = {8: 'legraise_u', 9: 'legraise_d', 20: 'lunge_d', 21: 'lunge_u', 
+        27: 'plank_u', 36: 'pushup_d', 37: 'pushup_u', 39: 'sitting_u', 46: 'situp_u', 47: 'situp_d', 56: 'squat_d', 57: 'squat_u', 61: 'walking_u', 0: 'none_u'}
                            
         self.detector = pm.poseDetector(
             model_dir='./model/all_model/body_language_mlp.pkl')
@@ -223,12 +223,13 @@ class VideoTransformTrack2(MediaStreamTrack):
             frame = await self.track.recv()
             img = frame.to_ndarray(format="bgr24")
             
+            
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             img = cv2.flip(img, 0)
             
             if self.drop % 4 == 0:
                 self.drop = 0
-                pose_row = self.detector.all_classify(img)
+                pose_row = self.detector.all_classify(cv2.resize(img, (640,480)))
                 self.sequence.append(np.array(pose_row))
                 if len(self.sequence) == 3:
                     input_data = np.expand_dims(self.sequence, axis=0)
