@@ -60,6 +60,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.drop = -1
         self.set_list = list(map(int,set_list.split(",")))
         self.pre_set=1
+        self.total_set=1
         if breaktime_list != '':
             self.breaktime_list = list(map(int, breaktime_list.split(",")))
         else:
@@ -103,15 +104,7 @@ class VideoTransformTrack(MediaStreamTrack):
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             img = cv2.flip(img, 0)
             if self.i < len(self.exercise_list):
-                # try:
-                #     if self.channel is not None:
-                #         self.channel.send(str(self.flow))
-                # except Exception as e:
-                #     print(e)
                 if self.flow == -1:
-                    # print(result)
-                    if self.channel is not None:
-                        self.channel.send("flow")
                     self.start_time = time.time()
                     self.sports = self.exercise_list[self.i]
                     self.label_d = f'{self.sports}_d'
@@ -132,7 +125,11 @@ class VideoTransformTrack(MediaStreamTrack):
                     self.flow = 0
                     try:
                         if self.sports not in self.progress:
-                            self.progress[self.sports]=0
+                            self.progress[self.sports]=[0]*self.set_list[self.i]
+                        elif self.sports in self.progress and self.pre_set==1:
+                            prelen=len(self.progress[self.sports])
+                            self.progress[self.sports].extend([0]*self.set_list[self.i])
+                            self.total_set=prelen+1
                     except Exception as e:
                         print(e)
                 if self.flow == 0 and time.time()-self.start_time < self.time:
@@ -144,11 +141,7 @@ class VideoTransformTrack(MediaStreamTrack):
                 if self.flow == 1 and self.posture != self.preposture:
                     img, self.posture = self.detector.set_posture(
                         img, self.idxx, self.model, "None",self.preposture, f'./dataset/example/{self.sports}.JPG', 200)
-                    # try:
-                    #     player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
-                    #     self.pc.addTrack(player.audio)
-                    # except Exception as e:
-                    #     print(e)
+                    
                 elif self.flow == 1 and self.posture == self.preposture:
                     self.flow = 2
                 
@@ -162,7 +155,7 @@ class VideoTransformTrack(MediaStreamTrack):
                             img, self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i])
                         self.finish_time = time.time()
                     if self.sports in self.progress:
-                        self.progress[self.sports]=self.cnt
+                        self.progress[self.sports][self.total_set-1]=self.cnt
                     else:
                         print("none")
                 elif self.flow == 2 and self.cnt >= self.goal[self.i]:
@@ -206,39 +199,35 @@ class VideoTransformTrack(MediaStreamTrack):
                         with open(f'./model/{str(self.exercise_list[self.i])}_model/body_language_lr.pkl', 'rb') as f:
                             self.model = pickle.load(f)
                         self.pre_set=1
+                        self.total_set=1
                         self.idxx=10
                     else:
                         self.pre_set+=1
+                        self.total_set+=1
                     self.flow = -1
                     self.posture = "None"
                     self.cnt = 0
                 # if self.flow == 6:
                     # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
                         
-                if self.flow == 6 and time.time()-self.goodjob_time < self.time+8:
+                if self.flow == 6 and time.time()-self.goodjob_time < self.time:
                     img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
 
                 elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
-                    # pass
                     self.progress['exit']=1
-                    # if self.channel is not None:
-                    #     # self.progress['exit']=1
-                    #     self.channel.send(
-                    #         json.dumps(self.progress)
-                    #     )
 
             new_frame = VideoFrame.from_ndarray(img, format="bgr24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
             self.before_frame = new_frame
             try:
-                if self.channel is not None:
-                    # self.progress['exit']=1
+                if self.channel is not None and (self.flow==2 or self.flow==6):
                     self.channel.send(
                         json.dumps(self.progress)
                     )
             except Exception as e:
                 print(e)
+            
             return new_frame
         else:
             return self.before_frame
@@ -273,18 +262,12 @@ async def start(request: Request):
 @app.post("/offer")
 async def offer(params: Offer):
     offer = RTCSessionDescription(sdp=params.sdp, type=params.type)
-
     pc = RTCPeerConnection()
     
 
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
     pcs.add(pc)
-    # def log_info(msg, *args):
-    #     logger.info(pc_id + " " + msg, *args)
-
-    # log_info("Created for %s", request.remote)
-
-    # prepare local media
+    
     player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
     recorder = MediaBlackhole()
     
@@ -300,10 +283,12 @@ async def offer(params: Offer):
         print(track.kind)
         if track.kind == "audio":
             # pass
-            # pc.addTrack(player.audio)
-            local_audio = AudioTransformTrack(track)
+            pc.addTrack(player.audio)
+            recorder.addTrack(track)
+
+            # local_audio = AudioTransformTrack(track)
             # pc.addTrack(local_audio) 
-            recorder.addTrack(local_audio)
+            # recorder.addTrack(local_audio)
             # pc.addTrack(local_audio)   
         elif track.kind == "video":
             global local_video
@@ -311,7 +296,7 @@ async def offer(params: Offer):
                 track, exercise_list=params.exercise, cnt_list=params.cnt, set_list=params.set, breaktime_list=params.breaktime
             )
             pc.addTrack(local_video)
-        
+            recorder.addTrack(track)
 
         @track.on("ended")
         async def on_ended():

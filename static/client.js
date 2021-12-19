@@ -100,49 +100,19 @@ function createPeerConnection() {
 	};
 
 	pc = new RTCPeerConnection(config);
-	// var audioElement=null;
-	// audioElement = new Audio("");
-	// audioElement.addEventListener('ended', function() {
-	// 	this.currentTime = 0;
-	// 	var promise = this.play();
-	// 	if (promise){
-	// 		promise.catch(function(error){
-	// 			console.error(error);
-	// 		});
-	// 	}
-	// }, false);
-
-	// document.body.appendChild(audioElement);
-	// audioElement.src = 'C:/Users/o_nag/workspace/Real_Time_Virtual_Home_Trainer/Wow.mp3';
-	// audioElement.id = "audioElement";
-
-	// audioElement.addEventListener('canplaythrough', function() {
-	// 	audioElement.play();
-	// }, false);
-
-	// audioElement.addEventListener('ended', function() {
-	// 	alert('ended');
-	// }, false);
-
-	// audioElement.onerror = function(event) {
-	//    console.log(event.code);
-	// }
+	
 	var channel = pc.createDataChannel("chat");
 	channel.onopen = function(event) {
 	channel.send('Hi you!');
 	}
-	// var audio = new Audio('Wow.mp3')
-	// audio.loop=false;
-	// audio.play();
 	
 	channel.onmessage = function(event) {
 		count=event.data
-
+		localStorage.setItem("count",count)
 		console.log(count)
-		// if(event.data.includes("exit")){
-
-		// 	// stop();
-		// }
+		if(event.data.includes("exit")){
+			stop();
+		}
 		
 	}
 	// register some listeners to help debugging
@@ -343,10 +313,10 @@ function sdpFilterCodec(kind, codec, realSdp) {
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
-
+function schedule(){
+	console.log(localStorage.getItem("count"))
+}
 function stop(){
 	location.href = "record.html";
-	console.log("b")
-	console.log(count)
-	console.log("A")
+	alert(count)
 }

@@ -110,7 +110,6 @@ class poseDetector:
                 first = model.predict([pose_row])[0]
                 print(first)
             except Exception as e:
-                print("b")
                 print(e)
             
             img = Image.fromarray(empty_img)
