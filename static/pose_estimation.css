@@ -33,13 +33,13 @@ nav .mylogo{
 
 nav .mylogo p{
   font-weight: bold;
-  font-size: 4vh;
+  font-size: 3vh;
   color: rgba(255, 255, 255, 0.9);
 }
 
 nav .mylogo img{
-  height: 5vh;
-  width: 5vh;
+  height: 4vh;
+  width: 4vh;
   opacity: 0.9
 }
 
@@ -76,9 +76,9 @@ nav .hamburger {
 
 .start{
   position: relative;
-  bottom: -5%;
   display: flex;
-  height: 30%;
+  bottom: -5%;
+  height: 25%;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -110,58 +110,33 @@ nav .hamburger {
   cursor: pointer;
 }
 
-.home {
-  background: url('./img/pushup.jpg') no-repeat;
-  background-size: cover;
-  height: 75vh;
-
-  display: flex;
-  flex-direction:column;
-  justify-content: center;
-  align-items: center;
-}
-
-.home .cover{
-  
-  width:100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.home .cover .title{
-  margin-top: 5vh;
-  font-size: 3em;
-  color: rgba(255, 255, 255, 0.8)
-}
-
 .nav-links{
   position: fixed;
   background: rgba(0, 0, 0, 0.95);
-  color:white;
-  font-size: 1.5em;
-  line-height: 100vh;
-  text-align: center;
   height: 100vh;
   width: 70%;
   margin-left: 100%;
+  display: flex;;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 1;
 
 }
 
+.nav-links li{
+  color: white;
+  font-size: 1.5em;
+  text-align: center;
+}
 
 .nav-links.open{
  margin-left: 30%;
  transition: margin-left 0.8s ease-in;
 }
 
-
 @media screen and (max-width: 500px){
   .home{
-    background: url('/img/main.jpg') no-repeat;
+    background: url('/img/bk.png') no-repeat;
     background-size: cover;
     height: 100vh;
 
@@ -184,12 +159,20 @@ nav .hamburger {
 
   .home .cover .title{
     position: relative;
-    top: -30vh;
-    font-size: 2em;
-    color: rgba(255, 255, 255, 0.8)
+    top: -25vh;
+    right: -23vw;
+    display:flex;
+    justify-content:baseline;
+    flex-direction:column;
   }
 
-  .home .record_page{
+  .home .cover .title .t{
+    font-size: 4.5vh;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .home .frame{
     height:80%;
     width:80%;
     background-color:rgba(0, 0, 0, 0.95);
@@ -200,7 +183,7 @@ nav .hamburger {
     align-items:flex-start;
   }
 
-  .home .record_page .card{
+  .home .frame .card{
     background-color:rgba(255, 255, 255, 0.9);
     border-radius: 5%;;
     height:25%;
@@ -233,13 +216,13 @@ nav .hamburger {
   .inner .date .title{
     width:100%;
     height:30%;
-    font-size: 4vh;
+    font-size: 3.5vh;
     font-weight: bold;
   }
 
   .inner .date .dw{
     height:30%;
-    font-size: 3.5vh;
+    font-size: 3vh;
     font-weight: bold;
     color: rgba(0, 0, 0, 0.7)
   }
@@ -270,47 +253,168 @@ nav .hamburger {
   .inner li{
     margin-top: 8px;
     box-shadow: 0px 2px rgba(0, 0, 0, 0.5);
-    font-size: 2.5vh;
+    font-size: 2.25vh;
     font-weight: bold;
     color: rgba(0, 0, 0, 0.9);
   }
+
+  .work_out{
+    width: 100%;
+    padding-bottom: 1vh;
+  }
+  .work_out ul{
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .work_out ul li{
+    color : rgba(255, 255, 255, 0.8);
+    font-size : 1.2rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .work_out_selection {
+    width: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .workouts{
+    width: 100%;
+  }
+
+  .workouts .list{
+    width: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  ul .exercise{
+    width: 53%;
+  }
+
+  ul .cnt{
+    width: 20%;
+  }
+
+  ul .set{
+    width: 20%;
+  }
+
+  ul .btn_x{
+    width: 7%;
+  }
+
+  .breaktime{
+
+    width: 100%;
+    display: flex;
+    margin-top: 2vh;
+    margin-bottom: 2vh;;
+    flex-direction: row;
+    justify-content: baseline;
+  }
+
+  .breaktime li{
+    color:rgba(255, 255, 255, 0.8);
+    width: 50.7%;
+    background-color: rgba(100, 100, 100, 0.8);
+    font-size: 0.85rem;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+    border: 1px solid black;
+  }
+
+  .breaktime .time {
+    width: 20%;
+    color:rgba(255, 255, 255, 0.8);
+    background-color: rgba(100, 100, 100, 0.8);
+    outline: 0 none;
+    border: 1px solid black;
+    text-align: center;
+  }
+
+  ul .time{
+    width: 20%;
+  }
+
+  .frame .add{
+
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    margin-top: 2vh;
+  }
+  .frame .add .btn_add{
+
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 2.75vh;
+    font-weight: bold;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.8);
+    border-radius: 0.5rem;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-align: center;
+  }
+
+  .start_wrap{
+    width:100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .start_wrap .button_wrap{
+    width:20%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .text_start{
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    font-size: 3vh;
+    font-weight: bold;
+  }
+
+  .workouts .list .exercise, 
+  .workouts .list .cnt, 
+  .workouts .list .set, 
+  .workouts .list .btn_x {
+   
+    color:rgba(255, 255, 255, 0.8);
+    background-color: rgba(100, 100, 100, 0.8);
+    outline: 0 none;
+    border: 1px solid black;
+    height: 4vh;
+  }
+
+  .workouts .list .cnt, 
+  .workouts .list .set {
+    text-align: center;
+  }
+
+  .workouts .list .exercise,
+  .workouts .list .btn_x{
+    height: 4.3vh;
+  }
+
+  .frame .floor_1{
+
+    height:65%;
+    width:100%;
+    overflow: auto;
+
+  }
+
+
 }
-
-.product{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.product .main{
-
-  width: 40%;
-  height: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.product .main .title{
-  margin-top: 10vh;
-  font-size: 2rem;
-}
-
-.product .main .line{
-  background-color: #000;
-  width: 80%;
-  height: 0.3vh;
-  margin-top: 1vh;
-}
-
-.product .main .description{
-
-  margin-top: 5vh;
-  font-size: 1rem;
-}
-
-
-
-

@@ -39,7 +39,7 @@ function addList(){
 	parent.lastChild.appendChild(ul2);
 	const break_time = document.createElement("li");
 	const time = document.createElement("input")
-	const default_time = document.createTextNode('BREAK')
+	const default_time = document.createTextNode("break time")
 	break_time.appendChild(default_time)
 	time.setAttribute('id', 'time')
 	time.setAttribute('class', 'time')

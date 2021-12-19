@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" type="text/css" href="static/pose_estimation.css">
+    <link rel="stylesheet" type="text/css" href="./static/pose_estimation.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -20,15 +20,15 @@
         <div class="mylogo" style="cursor: pointer" onclick="location.href='pose_estimation.html'">
           <p>CarryVan</p><img src="./img/logo.png" />
         </div>
-        <ul class="nav-links" onclick="location.href='record.html'">
-          Record
+        <ul class="nav-links">
+          <li onclick="location.href='record.html'">Record</li>
         <ul>
       </nav>
     </header>
 
     <main>
       <section class="home">
-        <div id="frame" class="record_page" >
+        <div id="frame" class="frame" >
           <div class="card">
             <div class="inner">
               <div class="date">
@@ -114,12 +114,9 @@
             var pt = data[i][j];
             var li = document.createElement("li");
             var temp = ""
-            if (pt.workout_name == "break"){
-              temp = "BREAK"+"  " + pt.breaktime +"sec";
-            } else{
-              temp = pt.workout_name.toUpperCase()+"  "+pt.count+"  "+pt.set;
+            if (pt.workout_name != "break"){
+              temp = pt.workout_name.toUpperCase()+"  "+pt.count+"x"+pt.set;
             }
-
             const textNode = document.createTextNode(temp);
             li.appendChild(textNode);
             w.appendChild(li)
