@@ -197,8 +197,7 @@ class VideoTransformTrack2(MediaStreamTrack):
             self.output_details = self.model.get_output_details()
         except Exception as e:
             print(e)
-        self.class_number = {8: 'legraise_u', 9: 'legraise_d', 20: 'lunge_d', 21: 'lunge_u', 
-        27: 'plank_u', 36: 'pushup_d', 37: 'pushup_u', 39: 'sitting_u', 46: 'situp_u', 47: 'situp_d', 56: 'squat_d', 57: 'squat_u', 61: 'walking_u', 0: 'none_u'}
+        self.class_number = {8: 'legraise_u', 9: 'legraise_d', 20: 'lunge_d', 21: 'lunge_u', 27: 'plank_u', 36: 'pushup_d', 37: 'pushup_u', 63: 'sitting_u', 46: 'situp_u', 47: 'situp_d', 56: 'squat_d', 57: 'squat_u', 65: 'walking_u', 0: 'none_u'}
                            
         self.detector = pm.poseDetector(
             model_dir='./model/all_model/body_language_mlp.pkl')
@@ -269,11 +268,17 @@ class VideoTransformTrack2(MediaStreamTrack):
                     self.workout[i] = self.cnt
                     self.key.remove(i)
                     
-                    
-            cv2.putText(img, self.class_number[self.pose_predict], (300, 30), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)    
-          
+            if self.class_number[self.pose_predict] == 'walking_u':
+                cv2.putText(img, 'walking', (300, 30), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)  
+            elif self.class_number[self.pose_predict] == 'sitting_u':
+                cv2.putText(img, 'sitting', (300, 30), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            else:
+                cv2.putText(img, self.class_number[self.pose_predict], (300, 30), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
+            
             cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, self.workout['pushup']), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
             cv2.putText(img, 'lunge' + str(self.workout_cnt['lunge']), (30, self.workout['lunge']), 
