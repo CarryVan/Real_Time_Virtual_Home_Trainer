@@ -158,9 +158,9 @@ async def one(request: Request):
 async def save_workout(params: Info, db: Session = Depends(get_db)):
     
     print(f"params: {params}")
-    exercise = params.exercise.split(",")
-    cnt = [int(x) for x in params.cnt.split(",")]
-    set = [int(x) for x in params.set.split(",")]
+    exercise = params.exercise
+    cnt = params.cnt
+    set = params.set
     exit = params.exit
 
     crud.save_workout_session(db, exit)
@@ -260,6 +260,4 @@ if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
                 port=8080,
-                ssl_keyfile="./localhost+2-key.pem",
-                ssl_certfile="./localhost+2.pem",
                 reload=True)

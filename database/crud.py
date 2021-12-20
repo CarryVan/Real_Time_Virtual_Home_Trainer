@@ -6,7 +6,7 @@ import models, schemas
 
 def save_counted_workout(db: Session, sw: schemas.SaveWorkout):
     db_workout_flow = models.WorkoutFlow(workout_session=sw.workout_session, workout_name=sw.workout_name, sequence=sw.sequence,
-                                set=sw.set, count=sw.count, breaktime = sw.breaktime)
+                                set=sw.set, count=sw.count)
     db.add(db_workout_flow)
     db.commit()
     db.refresh(db_workout_flow)

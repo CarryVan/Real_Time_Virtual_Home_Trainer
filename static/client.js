@@ -102,11 +102,10 @@ function createPeerConnection() {
 	}
 	
 	channel.onmessage = function(event) {
-		count=event.data
-		localStorage.setItem("count",count)
-		console.log(count)
+		data=event.data
+		
 		if(event.data.includes("finish")){
-			stop();
+			stop(data);
 		}
 		
 	}
@@ -212,6 +211,8 @@ function start() {
 	localStorage.setItem("cnt", cnt_list)
 	localStorage.setItem("set", set_list)
 	localStorage.setItem("breaktime", breaktime_list)
+	localStorage.setItem("exit", 1)
+
 	location.href = "start.html";
 
 }
@@ -249,8 +250,6 @@ function start_camera(){
 	});
 
 }
-
-
 
 function negotiate_live() {
 	return pc.createOffer().then(function(offer) {
@@ -291,8 +290,6 @@ function negotiate_live() {
 		alert(e);
 	});
 }
-
-
 
 
 function live_camera(){
@@ -392,23 +389,20 @@ function escapeRegExp(string) {
 function record(){
 	console.log(localStorage.getItem("count"))
 }
-function stop(){
+function stop(data){
 
-	console.log("exercise: " + localStorage.getItem("exercise"))
-	console.log("cnt: " + localStorage.getItem("cnt"))
-	console.log("set: " + localStorage.getItem("set"))
-	console.log("exit: " + localStorage.getItem("exit"))
-
+	data = JSON.parse(data)
+	// {"exercise": ["squat", "pushup"], "cnt": [1, 1], "set": [1, 0], "exit": 1}
 	fetch("/save_workout", {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			exercise: localStorage.getItem("exercise"),
-			cnt: localStorage.getItem("cnt"),
-			set: localStorage.getItem("set"),
-			exit: localStorage.getItem("exit")
+			exercise: data.exercise,
+			cnt: data.cnt,
+			set: data.set,
+			exit: data.exit
 		})
 	})
 	.then(response => response.json())

@@ -75,7 +75,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.channel=None
         self.progress={}
         self.progress['exercise']=self.exercise_list
-        self.progress['cnt']=self.cnt_list
+        self.progress['cnt']=self.goal
         self.progress['set']=[0]*len(self.cnt_list)
         self.progress['exit']=1
     async def recv(self):
@@ -183,7 +183,7 @@ class VideoTransformTrack(MediaStreamTrack):
                     self.cnt = 0
                 ##현재 정해진 운동 완료하면 자동으로 record로 가는데, 계속 띄워놓고 싶으면 이걸로
                 # if self.flow == 6:
-                    # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
+                #     img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
                         
                 if self.flow == 6 and time.time()-self.goodjob_time < self.time:
                     img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
