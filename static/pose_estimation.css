@@ -8,74 +8,51 @@
   color: #000;
 }
 
-.head_bg{
-  position: relative;
-  width: 100%;
-  height: 200px;
-  background-color: black;
-}
-
-input[id="menuicon"]{
-  display: none;
-}
-
-input[id="menuicon"] + label{
-  top: 30px;
-  margin-left: 5px;
-  margin-top: 5px;
-  display: block;
-  width: 40px;
-  height: 40px;
-  position: relative;
-  cursor: pointer;
-}
-
-input[id="menuicon"] + label span{
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 5px;
-  border-radius: 30px;
+.line{
+  width: 35px;
+  height: 4px;
   background: white;
-  z-index: 2;
-  transition: all .35s;
+  margin: 6px;
 }
 
-input[id="menuicon"] + label span:nth-child(1){
-  top: 10%;
-}
-input[id="menuicon"] + label span:nth-child(2){
-  top: 50%;
-  transform: translateY(-50%)
-}
-input[id="menuicon"] + label span:nth-child(3){
-  bottom: 10%;
+nav{
+  height: 10vh;
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.9);
+  position: relative;
 }
 
-input[id="menuicon"]:checked + label span:nth-child(1){
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-}
-input[id="menuicon"]:checked + label span:nth-child(2){
-  opacity: 0;
-}
-input[id="menuicon"]:checked + label span:nth-child(3){
-  bottom: 50%;
-  transform: translateY(50%) rotate(-45deg);
-}
-
-div[class="sidebar"]{
-  width: 200px;
+nav .mylogo{
   height: 100%;
-  background: #222;
-  position: fixed;
-  top: 0px;
-  left: -200px;
-  transition: all .35s;
-  z-index: 1;
+  width: 40%;
+  margin-left: 5%;
+  display:flex;
+  justify-content: center;
+  align-items: center; 
 }
 
-input[id="menuicon"]:checked + label + div {left:0;}
+nav .mylogo p{
+  font-weight: bold;
+  font-size: 3vh;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+nav .mylogo img{
+  height: 4vh;
+  width: 4vh;
+  opacity: 0.9
+}
+
+nav .hamburger {
+  height: 55%;
+  width: 8%;
+  position: absolute;
+  cursor: pointer;
+  right: 5%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
 
 .sidebar .sidemenu{
   height: 150px;
@@ -117,29 +94,342 @@ input[id="menuicon"]:checked + label + div {left:0;}
   transform: translate(-50%, -50%);
 }
 .start{
-  margin-top: 10%;
-  height: 97px;
-  width: 100%;
+  position: relative;
+  display: flex;
+  bottom: -5%;
+  height: 25%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
-.start button{
-  background-color: black;
-  color: white;
-  width: 200px;
-  height: 70px;
-  font-size: 30px;
-  font-weight: bolder;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  border-radius: 20px;
-  position: relative;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.start .button{
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
+
+.start .text_start{
+  font-size: 2.5vh;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+}
+
+.start img{
+  height: 40%
+}
+
 .start button:focus{
   outline: 0;
 }
 .start button:hover{
   background-color: rgba(0, 0, 0, 0.3);
   cursor: pointer;
+}
+
+.nav-links{
+  position: fixed;
+  background: rgba(0, 0, 0, 0.95);
+  height: 100vh;
+  width: 70%;
+  margin-left: 100%;
+  display: flex;;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 1;
+
+}
+
+.nav-links li{
+  color: white;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+.nav-links.open{
+ margin-left: 30%;
+ transition: margin-left 0.8s ease-in;
+}
+
+@media screen and (max-width: 500px){
+  .home{
+    background: url('/img/bk.png') no-repeat;
+    background-size: cover;
+    height: 100vh;
+
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .home .cover{
+    width:100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .home .cover .title{
+    position: relative;
+    top: -20vh;
+    font-size: 4.2vh;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+    display:flex;
+    justify-content:baseline;
+    flex-direction:column;
+  }
+
+  .home .frame{
+    height:80%;
+    width:80%;
+    background-color:rgba(0, 0, 0, 0.2);
+    
+    display: flex;
+    flex-direction: column;
+    justify-content:baseline;
+    align-items:flex-start;
+  }
+
+  .home .frame .card{
+    background-color:rgba(255, 255, 255, 0.9);
+    border-radius: 5%;;
+    height:25%;
+    width:100%;
+    border: 1px solid black;
+    margin-bottom: 2vh;
+
+    display:flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .inner{
+    height: 80%;
+    width: 100%;
+
+    display:flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .inner .date{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-right: 2vh;
+  }
+
+  .inner .date .title{
+    width:100%;
+    height:30%;
+    font-size: 3.5vh;
+    font-weight: bold;
+  }
+
+  .inner .date .dw{
+    height:30%;
+    font-size: 3vh;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.7)
+  }
+
+  .inner .line{
+    width:1%;
+    height:100%;
+    background-color: rgba(0, 0, 0, 0.7)
+  }
+
+  .inner .workout{
+    height:100%;
+    width:60%;
+    overflow: auto;
+    display:flex;
+    justify-content: top;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .inner ul{
+    display:flex;
+    justify-content: top;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .inner li{
+    margin-top: 8px;
+    box-shadow: 0px 2px rgba(0, 0, 0, 0.5);
+    font-size: 2.25vh;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  .work_out{
+    width: 100%;
+    padding-bottom: 1vh;
+  }
+  .work_out ul{
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .work_out ul li{
+    color : rgba(255, 255, 255, 0.8);
+    font-size : 1.2rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .work_out_selection {
+    width: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .workouts{
+    width: 100%;
+  }
+
+  .workouts .list{
+    width: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  ul .exercise{
+    width: 53%;
+  }
+
+  ul .cnt{
+    width: 20%;
+  }
+
+  ul .set{
+    width: 20%;
+  }
+
+  ul .btn_x{
+    width: 7%;
+  }
+
+  .breaktime{
+
+    width: 100%;
+    display: flex;
+    margin-top: 2vh;
+    margin-bottom: 2vh;;
+    flex-direction: row;
+    justify-content: baseline;
+  }
+
+  .breaktime li{
+    color:rgba(255, 255, 255, 0.8);
+    width: 50.7%;
+    background-color: rgba(100, 100, 100, 0.8);
+    font-size: 0.85rem;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+    border: 1px solid black;
+  }
+
+  .breaktime .time {
+    width: 20%;
+    color:rgba(255, 255, 255, 0.8);
+    background-color: rgba(100, 100, 100, 0.8);
+    outline: 0 none;
+    border: 1px solid black;
+    text-align: center;
+  }
+
+  ul .time{
+    width: 20%;
+  }
+
+  .frame .add{
+
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    margin-top: 2vh;
+  }
+  .frame .add .btn_add{
+
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 2.75vh;
+    font-weight: bold;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.8);
+    border-radius: 0.5rem;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-align: center;
+  }
+
+  .start_wrap{
+    width:100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .start_wrap .button_wrap{
+    width:20%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .text_start{
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    font-size: 2.5vh;
+    font-weight: bold;
+  }
+
+  .workouts .list .exercise, 
+  .workouts .list .cnt, 
+  .workouts .list .set, 
+  .workouts .list .btn_x {
+   
+    color:rgba(255, 255, 255, 0.8);
+    background-color: rgba(100, 100, 100, 0.8);
+    outline: 0 none;
+    border: 1px solid black;
+    height: 4vh;
+  }
+
+  .workouts .list .cnt, 
+  .workouts .list .set {
+    text-align: center;
+  }
+
+  .workouts .list .exercise,
+  .workouts .list .btn_x{
+    height: 4.3vh;
+  }
+
+  .frame .floor_1{
+
+    height:65%;
+    width:100%;
+    overflow: auto;
+
+  }
+
+
 }

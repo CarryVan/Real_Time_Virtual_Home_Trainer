@@ -59,16 +59,22 @@ class poseDetector:
                 org=((width-w)//2,(height-h)//2-1.5*h)
             elif y==5:
                 org=((width-w*2.5),(h))
+            elif y==6:
+                org=((width-w)//2,(height-h)//2-h*0.5)
+            elif y==7:
+                org=((width-w)//2,(height-h)//2+h*1.5)
+
+
             draw.text(org,text,font=font,fill=(255,255,255))
         except Exception as e:
             pass
         return img
-    def title(self, img,title,plus):
+    def title(self, img,title,plus,size1=85,size2=85,y1=0,y2=1):
         img.flags.writeable = True
         img = Image.fromarray(img)
         try:
-            img = self.drawTitle(img,title,85,0)
-            img=self.drawTitle(img, plus, 85, 1)
+            img = self.drawTitle(img,title,size1,y1)
+            img=self.drawTitle(img, plus, size2, y2)
         except Exception as e:
             pass
         img = np.array(img)

@@ -9,6 +9,11 @@ class Offer(BaseModel):
     set: str
     breaktime: str
 
+class Info(BaseModel):
+    exercise: str
+    cnt: str
+    set: str
+    breaktime: str
 class Live(BaseModel):
     sdp: str
     type: str

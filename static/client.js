@@ -39,7 +39,7 @@ function addList(){
 	parent.lastChild.appendChild(ul2);
 	const break_time = document.createElement("li");
 	const time = document.createElement("input")
-	const default_time = document.createTextNode('BREAK')
+	const default_time = document.createTextNode("break time")
 	break_time.appendChild(default_time)
 	time.setAttribute('id', 'time')
 	time.setAttribute('class', 'time')
@@ -77,13 +77,15 @@ function removeList(ths){
 }
 
 
-
-
 // peer connection
 var pc = null;
 
 // data channel
 var dc = null, dcInterval = null;
+// var audio = new Audio('../Wow.mp3');
+// var audio = new Audio('C:/Users/o_nag/workspace/Real_Time_Virtual_Home_Trainer/Wow.mp3');
+// audio.play();
+var count=''
 
 function createPeerConnection() {
 		// get DOM elements
@@ -96,7 +98,21 @@ function createPeerConnection() {
 	};
 
 	pc = new RTCPeerConnection(config);
-
+	
+	var channel = pc.createDataChannel("chat");
+	channel.onopen = function(event) {
+	channel.send('Hi you!');
+	}
+	
+	channel.onmessage = function(event) {
+		count=event.data
+		localStorage.setItem("count",count)
+		console.log(count)
+		if(event.data.includes("exit")){
+			stop();
+		}
+		
+	}
 	// register some listeners to help debugging
 	pc.addEventListener('icegatheringstatechange', function() {
 			iceGatheringLog.textContent += ' -> ' + pc.iceGatheringState;
@@ -143,9 +159,11 @@ function negotiate() {
 					}
 			});
 	}).then(function() {
+			// console.log("offer")
 			var offer = pc.localDescription;
 			return fetch('/offer', {
 				body: JSON.stringify({
+
 						sdp: offer.sdp,
 						type: offer.type,
 						exercise: localStorage.getItem("exercise"),
@@ -198,6 +216,23 @@ function start() {
 	localStorage.setItem("set", set_list)
 	localStorage.setItem("breaktime", breaktime_list)
 	location.href = "start.html";
+
+	fetch("/save_workout", {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			exercise: localStorage.getItem("exercise"),
+			cnt: localStorage.getItem("cnt"),
+			set: localStorage.getItem("set"),
+			breaktime: localStorage.getItem("breaktime")
+		})
+	})
+	.then(response => response.json())
+	.then(data => console.log(data))
+
+	
 }
 
 function start_camera(){
@@ -374,7 +409,13 @@ function sdpFilterCodec(kind, codec, realSdp) {
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
-
+function schedule(){
+	console.log(localStorage.getItem("count"))
+}
 function stop(){
+
+	
+	
 	location.href = "record.html";
+	alert(count)
 }

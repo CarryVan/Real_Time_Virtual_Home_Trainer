@@ -4,62 +4,73 @@
     <meta charset="UTF-8"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" type="text/css" href="static/schedule.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./static/pose_estimation.css"> -->
+    <link rel="stylesheet" type="text/css" href="./static/pose_estimation.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="static/jquery-3.5.1.min.js"></script>
   </head>
   <body>
-    <div class="wrap">
-      <div class="head_bg">
-        <h1>
-          SCHEDULE
-        </h1>
-        <input type="checkbox" id="menuicon">
-        <label for="menuicon">
-          <span></span>
-          <span></span>
-          <span></span>
-        </label>
-        <div class="sidebar">
-          <div class="sidemenu">
-            <button onclick="location.href='record.html'">
-              Record
-            </button>
-            <button onclick="location.href='schedule.html'">
-              Schedule
-            </button>
-          </div>
+    <header>
+      <nav>
+        <div class="hamburger">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
         </div>
-      </div>
-      <input class="btn_add" type="button", value="ADD" onclick="addList()">
-      <div class="work_out">
+        <div class="mylogo" style="cursor: pointer" onclick="location.href='pose_estimation.html'">
+          <p>CarryVan</p><img src="./img/logo.png" />
+        </div>
+        <ul class="nav-links">
+          <li onclick="location.href='record.html'">Record</li>
         <ul>
-          <li>EXE</li>
-          <li>CNT</li>
-          <li>SET</li>
-          <li>REM</li>
-        </ul>
-      </div>
-      <div class="work_out_selection" id="work_out_selection">
-        <div class="workouts">
-          <ul class="list">
-            <select class="exercise" name="exercise" id="exercise">
-              {# <option value="운동선택">운동선택</option> #}
-              <option value="pushup">pushup</option>
-              <option value="plank">plank</option>
-              <option value="squat">squat</option>
-              <option value="legraise">legraise</option>
-              <option value="lunge">lunge</option>
-            </select>
-            <input class="cnt" type="text" id="cnt" value="1" size="2">
-            <input class="set" type="text" id="set" value="1" size="2">
-            <input type="button" class="btn_x" value="x" size="2">
-          </ul>
+      </nav>
+    </header>
+
+      <section class="home">
+        <div class="cover">
+          <div id="frame" class="frame">
+            <div class = "floor_1">
+              <div class="work_out">
+                <ul>
+                  <li class="exercise">EXE</li>
+                  <li class="cnt">CNT</li>
+                  <li class="set">SET</li>
+                  <li class="btn_x"></li>
+                </ul>
+              </div>
+              <div class="work_out_selection" id="work_out_selection">
+                <div class="workouts">
+                  <ul class="list">
+                    <select class="exercise" name="exercise" id="exercise">
+                      <option value="pushup">pushup</option>
+                      <option value="plank">plank</option>
+                      <option value="squat">squat</option>
+                      <option value="legraise">legraise</option>
+                      <option value="lunge">lunge</option>
+                    </select>
+                    <input class="cnt" type="text" id="cnt" value="1" size="2">
+                    <input class="set" type="text" id="set" value="1" size="2">
+                    <input type="button" class="btn_x" value="x" size="2">
+                  </ul>
+                </div>
+              </div>
+              <div class="add" onclick="addList()">
+                <div class="btn_add">ADD</div>
+              </div>       
+          </div>
+          <div class="start_wrap">
+            <div class="button_wrap" onclick="start();">   
+              <div class="text_start">START!</div>
+              <img src="./img/start.png"/>
+            </div> 
+          </div>    
         </div>
-      </div>
-      <input class="btn_start" type="button", value="START" onclick="start();">
-    </div>
+        </div>  
+      </section>
+      
   </body>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="static/client.js"></script>
+  <script src="static/event.js"></script>
 </html>

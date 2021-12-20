@@ -4,41 +4,56 @@
     <meta charset="UTF-8"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" type="text/css" href="static/pose_estimation.css">
+    <link rel="stylesheet" type="text/css" href="./static/pose_estimation.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <div class="wrap">
-      <div class="head_bg">
-        <input type="checkbox" id="menuicon">
-        <label for="menuicon">
-          <span></span>
-          <span></span>
-          <span></span>
-        </label>
-        <div class="sidebar">
-          <div class="sidemenu">
-            <button onclick="location.href='record.html'">
-              Record
-            </button>
-            <button onclick="location.href='schedule.html';">
-              Schedule
-            </button>
-          </div>
+    <!-- <div class="sidemenu">
+      <button onclick="location.href='record.html'">
+        Record
+      </button>
+      <button onclick="location.href='schedule.html';">
+        Schedule
+      </button>
+    </div> -->
+    
+    <header>
+      <nav>
+        <div class="hamburger">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
         </div>
-      </div>
-      <div class="live">
-        <button onclick="location.href='live.html'">
-          LIVE
-        </button>
-      </div>
-      <div class="start">
-        <button onclick="location.href='schedule.html'">
-          START
-        </button>
-      </div>
-    </div>
+        <div class="mylogo" style="cursor: pointer" onclick="location.href='pose_estimation.html'">
+          <p>CarryVan</p><img src="./img/logo.png" />
+        </div>
+        <ul class="nav-links">
+          <li onclick="location.href='record.html'">Record</li>
+        <ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="home">
+        <div class="cover">
+          <div class="title">
+            Virtual Home Trainer
+          </div>
+          <div class ="start">
+            <div class = "button" >
+              <div class="text_start">LIVE MODE</div>
+              <img src="./img/start.png" onclick="location.href='live.html'"/>
+            </div>
+            <div class = "button" onclick="location.href='schedule.html'">
+              <div class="text_start">SCHEDULE MODE</div>
+              <img src="./img/start.png" onclick="location.href='schedule.html'" />
+            </div>
+          </div>
+        </div>  
+      </section>
+    </main>
   </body>
-  <script src="static/client.js"></script>
+  <script src="./static/client.js"></script>
+  <script src="./static/event.js"></script>
 </html>

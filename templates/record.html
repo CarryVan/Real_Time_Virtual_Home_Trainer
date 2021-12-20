@@ -4,99 +4,147 @@
     <meta charset="UTF-8"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" type="text/css" href="static/record.css">
+    <link rel="stylesheet" type="text/css" href="./static/pose_estimation.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
   </head>
-  <body>
-    <div class="wrap">
-      <div class="head_bg">
-        <h1>
-          RECORD
-        </h1>
-        <input type="checkbox" id="menuicon">
-        <label for="menuicon">
-          <span></span>
-          <span></span>
-          <span></span>
-        </label>
-        <div class="sidebar">
-          <div class="sidemenu">
-            <button onclick="location.href='record.html'">
-              Record
-            </button>
-            <button onclick="location.href='schedule.html'">
-              Schedule
-            </button>
-          </div>
+  <body onload="load()">
+    <header>
+      <nav>
+        <div class="hamburger">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
         </div>
-      </div>
-      <div class="workout_database">
-        <ul class="workouts">
-          <li>
-            <div>
-              11.30<br>
-              (Tue)
+        <div class="mylogo" style="cursor: pointer" onclick="location.href='pose_estimation.html'">
+          <p>CarryVan</p><img src="./img/logo.png" />
+        </div>
+        <ul class="nav-links">
+          <li onclick="location.href='record.html'">Record</li>
+        <ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="home">
+        <div id="frame" class="frame" >
+          <div class="card">
+            <div class="inner">
+              <div class="date">
+                <div id="t_11" class="title"></div>
+                <div id="t_12" class="dw"></div>
+              </div>
+              <div class="line"></div>
+              <div class="workout">
+                <ul id = "w_1">
+                </ul>
+              </div>
             </div>
-          </li>
-          <div class="videowrapper">
-            <iframe src="one.html" width="100%" height="100%"></iframe>
           </div>
-        </ul>
-      </div>
-      <div class="workout_database">
-        <ul class="workouts">
-          <li>
-            <div>
-              11.30<br>
-              (Tue)
+          <div class="card">
+            <div class="inner">
+              <div class="date">
+                <div id="t_21" class="title"></div>
+                <div id="t_22" class="dw"></div>
+              </div>
+              <div class="line"></div>
+              <div class="workout">
+                <ul id = "w_2">
+                </ul>
+              </div>
             </div>
-          </li>
-          <div class="videowrapper">
-            <iframe src="one.html" width="100%" height="100%"></iframe>
           </div>
-        </ul>
-      </div>
-      <div class="workout_database">
-        <ul class="workouts">
-          <li>
-            <div>
-              11.30<br>
-              (Tue)
+          <div class="card">
+            <div class="inner">
+              <div class="date">
+                <div id="t_31" class="title"></div>
+                <div id="t_32" class="dw"></div>
+              </div>
+              <div class="line"></div>
+              <div class="workout">
+                <ul id = "w_3">
+                </ul>
+              </div>
             </div>
-          </li>
-          <div class="videowrapper">
-            <iframe src="one.html" width="100%" height="100%"></iframe>
           </div>
-        </ul>
-      </div>
-      <div class="workout_database">
-        <ul class="workouts">
-          <li>
-            <div>
-              11.30<br>
-              (Tue)
-            </div>
-          </li>
-          <div class="videowrapper">
-            <iframe src="one.html" width="100%" height="100%"></iframe>
-          </div>
-        </ul>
-      </div>
-      <div class="workout_database">
-        <ul class="workouts">
-          <li>
-            <div>
-              11.30<br>
-              (Tue)
-            </div>
-          </li>
-          <div class="videowrapper">
-            <iframe src="one.html" width="100%" height="100%"></iframe>
-          </div>
-        </ul>
-      </div>
-    </div>
+        </div>   
+      </section>
+    </main>
   </body>
-  <script src="static/client.js"></script>
+  <script>
+    function getDate(date_time){
+
+      var week = ["Sun", "Mon", "Tue", "Wed", "Tur", "Fri", "Sat"];
+
+      var dayOfWeek = week[new Date(date_time).getDay()]; 
+
+      return dayOfWeek;
+    }
+
+    function load(){
+      
+      fetch("/workout_data", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        
+        console.log(data)
+        for (var i = 0; i < data.length; i++){
+          
+          var t1 = document.getElementById("t_".concat(String(i+1), "1"))
+          var t2 = document.getElementById("t_".concat(String(i+1), "2"))
+          var w = document.getElementById("w_".concat(String(i+1)))
+
+          date_time = data[i][0]
+          console.log(date_time)
+          for (var j = 0; j < date_time.length; j++){
+            if (date_time[j] == "T"){
+              date_time = date_time.slice(5, j)
+            }
+          }
+
+          var li = []
+
+          for (var j = 1; j < data[i].length; j++){
+            var pt = data[i][j];
+            var li = document.createElement("li");
+            var temp = ""
+            if (pt.workout_name != "break"){
+              temp = pt.workout_name.toUpperCase()+"  "+pt.count+"x"+pt.set;
+            }
+            const textNode = document.createTextNode(temp);
+            li.appendChild(textNode);
+            w.appendChild(li)
+          }
+          dw=getDate(date_time)
+          t1.innerHTML = date_time
+          t2.innerHTML = dw
+        }
+        
+      //  for (var j = 0; j < data[0][i].length; j++){
+       //   var w_li = document.createElement("li");
+      //}
+     
+      });
+    }
+
+    function loaded(){
+     
+      var newDIV = document.createElement("div");
+      var p = document.getElementById("frame")
+
+      newDIV.innerHTML = "Pushup"
+      newDIV.setAttribute("id","myDiv");
+      newDIV.style.backgroundColor="yellow";
+
+      p.appendChild(newDIV);
+    }
+  </script>
+  
+  <script src="static/event.js"></script>
 </html>
