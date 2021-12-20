@@ -165,6 +165,7 @@ async def one(request: Request):
 @app.post("/save_workout")
 async def save_workout(params: Info, db: Session = Depends(get_db)):
     
+    print(f"params: {params}")
     exercise = params.exercise.split(",")
     cnt = [int(x) for x in params.cnt.split(",")]
     set = [int(x) for x in params.set.split(",")]

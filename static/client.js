@@ -397,6 +397,11 @@ function schedule(){
 }
 function stop(){
 
+	console.log("exercise: " + localStorage.getItem("exercise"))
+	console.log("cnt: " + localStorage.getItem("cnt"))
+	console.log("set: " + localStorage.getItem("set"))
+	console.log("exit: " + localStorage.getItem("exit"))
+
 	fetch("/save_workout", {
 		method: 'POST',
 		headers: {
