@@ -59,10 +59,6 @@ class VideoTransformTrack(MediaStreamTrack):
 
         self.goal = list(map(int, self.cnt_list))
         self.flow = -1
-        # self.model="None"
-
-        # self.exercise_list = self.exercise_list[1:]
-        print(f"exercise_list : {self.exercise_list}, cnt_list : {self.cnt_list}, set_list : {self.set_list}, break_time_list : {self.breaktime_list}")
         with open(f'./model/{str(self.exercise_list[0])}_model/body_language_mlp.pkl', 'rb') as f:
             self.model = pickle.load(f)
         self.status = "None"
