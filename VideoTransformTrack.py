@@ -21,8 +21,6 @@ class AudioTransformTrack(MediaStreamTrack):
 
     async def recv(self):
         audio = await self.track.recv()
-        # player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
-        # audio = player.audio
         return audio
 
         

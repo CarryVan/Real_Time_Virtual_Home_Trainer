@@ -118,11 +118,6 @@ async def offer(params: Offer):
             # pass
             pc.addTrack(player.audio)
             recorder.addTrack(track)
-
-            # local_audio = AudioTransformTrack(track)
-            # pc.addTrack(local_audio) 
-            # recorder.addTrack(local_audio)
-            # pc.addTrack(local_audio)   
         elif track.kind == "video":
             global local_video
             local_video = VideoTransformTrack(
@@ -133,7 +128,6 @@ async def offer(params: Offer):
         @track.on("ended")
         async def on_ended():
             await recorder.stop()
-            # await pc.close()
             coros = [pc.close() for pc in pcs]
             await asyncio.gather(*coros)
             pcs.clear()
@@ -144,9 +138,7 @@ async def offer(params: Offer):
         local_video.channel=channel
         @channel.on("message")
         def on_message(message):
-            # if isinstance(message, str) and message.startswith("ping"):
-            #     channel.send("pong" + message[4:])
-            channel.send("mgs")
+            channel.send("msg")
     # handle offer
     await pc.setRemoteDescription(offer)
     await recorder.start()
@@ -168,7 +160,6 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     exercise = params.exercise.split(",")
     cnt = [int(x) for x in params.cnt.split(",")]
     set = [int(x) for x in params.set.split(",")]
-    # breaktime = [int(x) for x in params.breaktime.split(",")]
 
     most_recent = crud.get_recent_session(db)
     tot_len = len(exercise) + len(breaktime)
@@ -176,28 +167,19 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     crud.save_workout_session(db)
 
     for i in range(len(exercise)):
-        # index = i//2
         sw = SaveWorkout
         sw.workout_session = int(most_recent.id) + 1
         sw.sequence = i
         
-        # if i%2 == 0:    
         sw.workout_name = exercise[i]
         sw.set = set[i]
         sw.count = cnt[i]
         sw.breaktime = 0
 
-        # else:
-        #     sw.workout_name = "break"
-        #     sw.set = 0
-        #     sw.count = 0
-        #     sw.breaktime = breaktime[index]
-            
         crud.save_counted_workout(db, sw)
     
     return "saved!"
     
-#response_model=List[schemas.WorkoutFlow]
 @app.post("/workout_data")
 async def recent_workouts(db: Session = Depends(get_db)):
 
@@ -240,8 +222,6 @@ async def offer(params: Live):
     def on_track(track):
         if track.kind == "audio":
             local_audio = AudioTransformTrack(track)
-            # pc.addTrack(local_audio) 
-            # recorder.addTrack(track)   
         elif track.kind == "video":
             global local_video
 
@@ -259,9 +239,7 @@ async def offer(params: Live):
         local_video.channel=channel
         @channel.on("message")
         def on_message(message):
-            # if isinstance(message, str) and message.startswith("ping"):
-            #     channel.send("pong" + message[4:])
-            channel.send("mgs")
+            channel.send("msg")
     # handle offer
     await pc.setRemoteDescription(offer)
     await recorder.start()
