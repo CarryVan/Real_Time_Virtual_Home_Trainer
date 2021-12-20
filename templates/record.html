@@ -75,7 +75,7 @@
   <script>
     function getDate(date_time){
 
-      var week = ["Sun", "Mon", "Tue", "Wed", "Tur", "Fri", "Sat"];
+      var week = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
 
       var dayOfWeek = week[new Date(date_time).getDay()]; 
 
@@ -93,7 +93,6 @@
       .then(response => response.json())
       .then(data => {
         
-        console.log(data)
         for (var i = 0; i < data.length; i++){
           
           var t1 = document.getElementById("t_".concat(String(i+1), "1"))
@@ -101,7 +100,6 @@
           var w = document.getElementById("w_".concat(String(i+1)))
 
           date_time = data[i][0]
-          console.log(date_time)
           for (var j = 0; j < date_time.length; j++){
             if (date_time[j] == "T"){
               date_time = date_time.slice(5, j)
@@ -125,26 +123,8 @@
           t1.innerHTML = date_time
           t2.innerHTML = dw
         }
-        
-      //  for (var j = 0; j < data[0][i].length; j++){
-       //   var w_li = document.createElement("li");
-      //}
-     
       });
     }
-
-    function loaded(){
-     
-      var newDIV = document.createElement("div");
-      var p = document.getElementById("frame")
-
-      newDIV.innerHTML = "Pushup"
-      newDIV.setAttribute("id","myDiv");
-      newDIV.style.backgroundColor="yellow";
-
-      p.appendChild(newDIV);
-    }
   </script>
-  
   <script src="static/event.js"></script>
 </html>

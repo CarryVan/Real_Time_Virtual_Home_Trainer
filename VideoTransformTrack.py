@@ -20,8 +20,6 @@ class AudioTransformTrack(MediaStreamTrack):
 
     async def recv(self):
         audio = await self.track.recv()
-        # player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
-        # audio = player.audio
         return audio
 
         
@@ -54,6 +52,8 @@ class VideoTransformTrack(MediaStreamTrack):
         self.goodjob_time = time.time()
         self.plank_time = "None"
 
+        print(f"exercise_list: {exercise_list}, breaktime_list: {breaktime_list}")
+
         self.posture = "None"
         self.preposture = "None"
 
@@ -77,8 +77,8 @@ class VideoTransformTrack(MediaStreamTrack):
             self.drop = 0
             # pose estimate
             img = frame.to_ndarray(format="bgr24")
-            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            img = cv2.flip(img, 0)
+            # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            # img = cv2.flip(img, 0)
             if self.i < len(self.exercise_list):
                 if self.flow == -1:
                     self.start_time = time.time()

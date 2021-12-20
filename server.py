@@ -168,30 +168,20 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     exercise = params.exercise.split(",")
     cnt = [int(x) for x in params.cnt.split(",")]
     set = [int(x) for x in params.set.split(",")]
-    breaktime = [int(x) for x in params.breaktime.split(",")]
+    exit = params.exit
 
+    crud.save_workout_session(db, exit)
     most_recent = crud.get_recent_session(db)
-    tot_len = len(exercise) + len(breaktime)
-
-    crud.save_workout_session(db)
 
     for i in range(len(exercise)):
-        # index = i//2
+
         sw = SaveWorkout
-        sw.workout_session = int(most_recent.id) + 1
+        sw.workout_session = int(most_recent.id)
         sw.sequence = i
-        
-        # if i%2 == 0:    
+          
         sw.workout_name = exercise[i]
         sw.set = set[i]
         sw.count = cnt[i]
-        sw.breaktime = 0
-
-        # else:
-        #     sw.workout_name = "break"
-        #     sw.set = 0
-        #     sw.count = 0
-        #     sw.breaktime = breaktime[index]
             
         crud.save_counted_workout(db, sw)
     

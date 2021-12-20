@@ -207,7 +207,7 @@ function start() {
 	for (var i=1; i < sets.length; i++){
 		set_list.push(sets[i].value)
 	}
-	for (var i=1; i< breaktimes.length; i++){
+	for (var i=0; i< breaktimes.length; i++){
 		breaktime_list.push(breaktimes[i].value)
 	}
 
@@ -217,22 +217,6 @@ function start() {
 	localStorage.setItem("breaktime", breaktime_list)
 	location.href = "start.html";
 
-	fetch("/save_workout", {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			exercise: localStorage.getItem("exercise"),
-			cnt: localStorage.getItem("cnt"),
-			set: localStorage.getItem("set"),
-			breaktime: localStorage.getItem("breaktime")
-		})
-	})
-	.then(response => response.json())
-	.then(data => console.log(data))
-
-	
 }
 
 function start_camera(){
@@ -345,7 +329,6 @@ function live_camera(){
 	}, function(err) {
 			alert('Could not acquire media: ' + err);
 	});
-
 }
 
 
@@ -414,7 +397,20 @@ function schedule(){
 }
 function stop(){
 
-	
+	fetch("/save_workout", {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			exercise: localStorage.getItem("exercise"),
+			cnt: localStorage.getItem("cnt"),
+			set: localStorage.getItem("set"),
+			exit: localStorage.getItem("exit")
+		})
+	})
+	.then(response => response.json())
+	.then(data => console.log(data))
 	
 	location.href = "record.html";
 	alert(count)

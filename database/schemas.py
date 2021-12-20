@@ -23,6 +23,7 @@ class WorkoutFlow(SaveWorkout):
 class SaveWorkoutSession(BaseModel):
 
     date_time : date
+    exit: int
 
 class WorkoutSession(SaveWorkoutSession):
 

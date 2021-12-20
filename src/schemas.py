@@ -13,7 +13,8 @@ class Info(BaseModel):
     exercise: str
     cnt: str
     set: str
-    breaktime: str
+    exit: int
+
 class Live(BaseModel):
     sdp: str
     type: str

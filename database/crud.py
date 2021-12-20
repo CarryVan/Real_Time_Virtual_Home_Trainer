@@ -13,9 +13,9 @@ def save_counted_workout(db: Session, sw: schemas.SaveWorkout):
 
     return db_workout_flow
 
-def save_workout_session(db: Session):
+def save_workout_session(db: Session, exit: int):
 
-    db_workout_session = models.WorkoutSession()
+    db_workout_session = models.WorkoutSession(exit = exit)
     db.add(db_workout_session)
     db.commit()
     db.refresh(db_workout_session)
@@ -28,7 +28,7 @@ def get_recent_session(db: Session):
 
 def get_recent_sessions(db: Session):
     model = models.WorkoutSession
-    return db.query(model).order_by(model.id.desc()).limit(3).all()
+    return db.query(model).order_by(model.id.desc()).limit(10).all()
 
 def get_workout_flows_by_id(db: Session, id:int):
     return db.query(models.WorkoutFlow).filter(models.WorkoutFlow.workout_session == id).all()
