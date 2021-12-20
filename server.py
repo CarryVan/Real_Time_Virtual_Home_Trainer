@@ -160,6 +160,8 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     exercise = params.exercise.split(",")
     cnt = [int(x) for x in params.cnt.split(",")]
     set = [int(x) for x in params.set.split(",")]
+    
+    breaktime = [int(x) for x in params.breaktime.split(",")]
 
     most_recent = crud.get_recent_session(db)
     tot_len = len(exercise) + len(breaktime)
@@ -257,3 +259,10 @@ async def on_shutdown(app):
     pcs.clear()
 
 
+if __name__ == "__main__":
+    uvicorn.run("server:app",
+                host="0.0.0.0",
+                port=8080,
+                ssl_keyfile="./localhost+2-key.pem",
+                ssl_certfile="./localhost+2.pem",
+                reload=True)

@@ -82,9 +82,6 @@ var pc = null;
 
 // data channel
 var dc = null, dcInterval = null;
-// var audio = new Audio('../Wow.mp3');
-// var audio = new Audio('C:/Users/o_nag/workspace/Real_Time_Virtual_Home_Trainer/Wow.mp3');
-// audio.play();
 var count=''
 
 function createPeerConnection() {
@@ -108,7 +105,7 @@ function createPeerConnection() {
 		count=event.data
 		localStorage.setItem("count",count)
 		console.log(count)
-		if(event.data.includes("exit")){
+		if(event.data.includes("finish")){
 			stop();
 		}
 		
@@ -207,7 +204,7 @@ function start() {
 	for (var i=1; i < sets.length; i++){
 		set_list.push(sets[i].value)
 	}
-	for (var i=1; i< breaktimes.length; i++){
+	for (var i=0; i< breaktimes.length; i++){
 		breaktime_list.push(breaktimes[i].value)
 	}
 
@@ -413,8 +410,5 @@ function record(){
 	console.log(localStorage.getItem("count"))
 }
 function stop(){
-
-	
-	
 	location.href = "record.html";
 }
