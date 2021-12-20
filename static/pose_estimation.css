@@ -94,7 +94,6 @@ nav .hamburger {
   transform: translate(-50%, -50%);
 }
 .start{
-<<<<<<< HEAD
   position: relative;
   display: flex;
   bottom: -5%;
@@ -102,11 +101,6 @@ nav .hamburger {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-=======
-  margin-top: 10%;
-  height: 97px;
-  width: 100%;
->>>>>>> 82a82a08c1951dd83ed132e2b2399575f8650f0f
 }
 
 .start .button{
@@ -161,7 +155,7 @@ nav .hamburger {
 
 @media screen and (max-width: 500px){
   .home{
-    background: url('/img/background2.png') no-repeat;
+    background: url('/img/bk.png') no-repeat;
     background-size: cover;
     height: 100vh;
 
