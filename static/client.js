@@ -217,6 +217,21 @@ function start() {
 	localStorage.setItem("breaktime", breaktime_list)
 	location.href = "start.html";
 
+	fetch("/save_workout", {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			exercise: localStorage.getItem("exercise"),
+			cnt: localStorage.getItem("cnt"),
+			set: localStorage.getItem("set"),
+			breaktime: localStorage.getItem("breaktime")
+		})
+	})
+	.then(response => response.json())
+	.then(data => console.log(data))
+
 	
 }
 
@@ -319,20 +334,7 @@ function schedule(){
 }
 function stop(){
 
-	fetch("/save_workout", {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			exercise: localStorage.getItem("exercise"),
-			cnt: localStorage.getItem("cnt"),
-			set: localStorage.getItem("set"),
-			breaktime: localStorage.getItem("breaktime")
-		})
-	})
-	.then(response => response.json())
-	.then(data => console.log(data))
+	
 	
 	location.href = "record.html";
 	alert(count)

@@ -93,7 +93,7 @@ nav .hamburger {
 }
 
 .start .text_start{
-  font-size: 1.5em;
+  font-size: 2.5vh;
   color: rgba(255, 255, 255, 0.8);
   padding: 10px;
 }
@@ -136,7 +136,7 @@ nav .hamburger {
 
 @media screen and (max-width: 500px){
   .home{
-    background: url('/img/bk.png') no-repeat;
+    background: url('/img/background2.png') no-repeat;
     background-size: cover;
     height: 100vh;
 
@@ -159,23 +159,19 @@ nav .hamburger {
 
   .home .cover .title{
     position: relative;
-    top: -25vh;
-    right: -23vw;
+    top: -20vh;
+    font-size: 4.2vh;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
     display:flex;
     justify-content:baseline;
     flex-direction:column;
   }
 
-  .home .cover .title .t{
-    font-size: 4.5vh;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
   .home .frame{
     height:80%;
     width:80%;
-    background-color:rgba(0, 0, 0, 0.95);
+    background-color:rgba(0, 0, 0, 0.2);
     
     display: flex;
     flex-direction: column;
@@ -382,7 +378,7 @@ nav .hamburger {
   .text_start{
     color: rgba(255, 255, 255, 0.8);
     text-align: center;
-    font-size: 3vh;
+    font-size: 2.5vh;
     font-weight: bold;
   }
 

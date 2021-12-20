@@ -4,13 +4,10 @@ import os
 import uuid
 import time
 import pickle
-<<<<<<< HEAD
 import sys
 from datetime import datetime
 
-=======
 import json
->>>>>>> a2d3878b7d4cfa988e15b6a10308240b6f5f26d5
 import cv2
 import pose_module as pm
 # from aiohttp import web
@@ -25,7 +22,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-<<<<<<< HEAD
 #database
 sys.path.append('./database')
 import crud, models, schemas
@@ -35,10 +31,6 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from src.schemas import Offer, Info
-=======
-from src.schemas import Offer
-
->>>>>>> a2d3878b7d4cfa988e15b6a10308240b6f5f26d5
 ROOT = os.path.dirname(__file__)
 
 #database connection
@@ -109,6 +101,8 @@ class VideoTransformTrack(MediaStreamTrack):
         self.goal = list(map(int, self.cnt_list))
         self.flow = -1
         # self.model="None"
+        print(f"self exercise: {self.exercise_list}")
+        self.exercise_list = self.exercise_list[1:]
         with open(f'./model/{str(self.exercise_list[0])}_model/body_language_lr.pkl', 'rb') as f:
             self.model = pickle.load(f)
         self.status = "None"
@@ -120,12 +114,8 @@ class VideoTransformTrack(MediaStreamTrack):
 
         self.label_d=""
         self.label_u=""
-<<<<<<< HEAD
-
-=======
         self.channel=None
         self.progress={}
->>>>>>> a2d3878b7d4cfa988e15b6a10308240b6f5f26d5
     async def recv(self):
         self.drop += 1
         frame = await self.track.recv()
