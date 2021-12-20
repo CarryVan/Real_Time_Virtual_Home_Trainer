@@ -168,7 +168,7 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     exercise = params.exercise.split(",")
     cnt = [int(x) for x in params.cnt.split(",")]
     set = [int(x) for x in params.set.split(",")]
-    breaktime = [int(x) for x in params.breaktime.split(",")]
+    # breaktime = [int(x) for x in params.breaktime.split(",")]
 
     most_recent = crud.get_recent_session(db)
     tot_len = len(exercise) + len(breaktime)
@@ -243,6 +243,8 @@ async def offer(params: Live):
             # pc.addTrack(local_audio) 
             # recorder.addTrack(track)   
         elif track.kind == "video":
+            global local_video
+
             local_video = VideoTransformTrack2(track)
             pc.addTrack(local_video)
             recorder.addTrack(track)
@@ -251,7 +253,15 @@ async def offer(params: Live):
         async def on_ended():
             await recorder.stop()
             await pc.close()
-
+    @pc.on("datachannel")
+    def on_datachannel(channel):
+        global local_video
+        local_video.channel=channel
+        @channel.on("message")
+        def on_message(message):
+            # if isinstance(message, str) and message.startswith("ping"):
+            #     channel.send("pong" + message[4:])
+            channel.send("mgs")
     # handle offer
     await pc.setRemoteDescription(offer)
     await recorder.start()
@@ -272,5 +282,7 @@ if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
                 port=8080,
+                ssl_keyfile="./localhost+2-key.pem",
+                ssl_certfile="./localhost+2.pem",
                 reload=True)
 
