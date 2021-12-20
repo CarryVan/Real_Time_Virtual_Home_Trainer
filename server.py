@@ -118,11 +118,6 @@ async def offer(params: Offer):
             # pass
             pc.addTrack(player.audio)
             recorder.addTrack(track)
-
-            # local_audio = AudioTransformTrack(track)
-            # pc.addTrack(local_audio) 
-            # recorder.addTrack(local_audio)
-            # pc.addTrack(local_audio)   
         elif track.kind == "video":
             global local_video
             local_video = VideoTransformTrack(
@@ -133,7 +128,6 @@ async def offer(params: Offer):
         @track.on("ended")
         async def on_ended():
             await recorder.stop()
-            # await pc.close()
             coros = [pc.close() for pc in pcs]
             await asyncio.gather(*coros)
             pcs.clear()
@@ -144,9 +138,7 @@ async def offer(params: Offer):
         local_video.channel=channel
         @channel.on("message")
         def on_message(message):
-            # if isinstance(message, str) and message.startswith("ping"):
-            #     channel.send("pong" + message[4:])
-            channel.send("mgs")
+            channel.send("msg")
     # handle offer
     await pc.setRemoteDescription(offer)
     await recorder.start()
@@ -175,7 +167,6 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     most_recent = crud.get_recent_session(db)
 
     for i in range(len(exercise)):
-
         sw = SaveWorkout
         sw.workout_session = int(most_recent.id)
         sw.sequence = i
@@ -188,7 +179,6 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
     
     return "saved!"
     
-#response_model=List[schemas.WorkoutFlow]
 @app.post("/workout_data")
 async def recent_workouts(db: Session = Depends(get_db)):
 
@@ -231,9 +221,9 @@ async def offer(params: Live):
     def on_track(track):
         if track.kind == "audio":
             local_audio = AudioTransformTrack(track)
-            # pc.addTrack(local_audio) 
-            # recorder.addTrack(track)   
         elif track.kind == "video":
+            global local_video
+
             local_video = VideoTransformTrack2(track)
             pc.addTrack(local_video)
             recorder.addTrack(track)
@@ -242,7 +232,13 @@ async def offer(params: Live):
         async def on_ended():
             await recorder.stop()
             await pc.close()
-
+    @pc.on("datachannel")
+    def on_datachannel(channel):
+        global local_video
+        local_video.channel=channel
+        @channel.on("message")
+        def on_message(message):
+            channel.send("msg")
     # handle offer
     await pc.setRemoteDescription(offer)
     await recorder.start()
@@ -259,9 +255,11 @@ async def on_shutdown(app):
     await asyncio.gather(*coros)
     pcs.clear()
 
+
 if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
                 port=8080,
+                ssl_keyfile="./localhost+2-key.pem",
+                ssl_certfile="./localhost+2.pem",
                 reload=True)
-
