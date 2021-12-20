@@ -268,31 +268,31 @@ class VideoTransformTrack2(MediaStreamTrack):
                     self.workout[i] = self.cnt
                     self.key.remove(i)
                     
-            if self.class_number[self.pose_predict] == 'walking_u':
-                cv2.putText(img, 'walking', (300, 30), 
-                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)  
-            elif self.class_number[self.pose_predict] == 'sitting_u':
-                cv2.putText(img, 'sitting', (300, 30), 
-                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-            else:
-                cv2.putText(img, self.class_number[self.pose_predict], (300, 30), 
-                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            # if self.class_number[self.pose_predict] == 'walking_u':
+            #     cv2.putText(img, 'walking', (300, 30), 
+            #                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)  
+            # elif self.class_number[self.pose_predict] == 'sitting_u':
+            #     cv2.putText(img, 'sitting', (300, 30), 
+            #                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            # else:
+            #     cv2.putText(img, self.class_number[self.pose_predict], (300, 30), 
+            #                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
             
             cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, self.workout['pushup']), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
             cv2.putText(img, 'lunge' + str(self.workout_cnt['lunge']), (30, self.workout['lunge']), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
             cv2.putText(img, 'plank' + str(self.workout_cnt['plank']), (30, self.workout['plank']), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
             cv2.putText(img, 'squat' + str(self.workout_cnt['squat']), (30, self.workout['squat']), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
             cv2.putText(img, 'legraise' + str(self.workout_cnt['legraise']), (30, self.workout['legraise']), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
             cv2.putText(img, 'situp' + str(self.workout_cnt['situp']), (30, self.workout['situp']), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
             cv2.putText(img, 'dumbbell' + str(self.workout_cnt['dumbbell']), (30, self.workout['dumbbell']), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
 
 
             new_frame = VideoFrame.from_ndarray(img, format="bgr24")
