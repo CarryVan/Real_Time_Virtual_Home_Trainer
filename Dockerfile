@@ -17,5 +17,4 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY . .
 
-# CMD uvicorn server:app --host 0.0.0.0 --port 80
-CMD uvicorn server:app --host 0.0.0.0 --port 80 --ssl-keyfile ../key.pem --ssl-certfile ../cert.pem --reload
+CMD gunicorn -k uvicorn.workers.UvicornWorker --certfile=../cert.pem --keyfile=../key.pem  --access-logfile ./gunicorn-access.log server:app --bind 0.0.0.0:80 --workers 4

@@ -73,8 +73,28 @@ nav .hamburger {
   background-color:rgba(0, 0, 0, 0.3);
 }
 
+.live{
+  margin-top: 60%;
+  height: 97px;
+  width: 100%;
+}
 
+.live button{
+  background-color: black;
+  color: white;
+  width: 200px;
+  height: 70px;
+  font-size: 30px;
+  font-weight: bolder;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .start{
+<<<<<<< HEAD
   position: relative;
   display: flex;
   bottom: -5%;
@@ -82,6 +102,11 @@ nav .hamburger {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+=======
+  margin-top: 10%;
+  height: 97px;
+  width: 100%;
+>>>>>>> 82a82a08c1951dd83ed132e2b2399575f8650f0f
 }
 
 .start .button{

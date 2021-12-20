@@ -14,3 +14,6 @@ class Info(BaseModel):
     cnt: str
     set: str
     breaktime: str
+class Live(BaseModel):
+    sdp: str
+    type: str
