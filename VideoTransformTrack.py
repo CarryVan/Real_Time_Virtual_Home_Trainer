@@ -11,19 +11,7 @@ import numpy as np
 import copy
 import time
 import json
-class AudioTransformTrack(MediaStreamTrack):
-    
-    kind = "audio"
 
-    def __init__(self, track):
-        super().__init__()  # don't forget this!
-        self.track = track
-
-    async def recv(self):
-        audio = await self.track.recv()
-        return audio
-
-        
 class VideoTransformTrack(MediaStreamTrack):
     """
     A video stream track that transforms frames from an another track.
@@ -32,9 +20,7 @@ class VideoTransformTrack(MediaStreamTrack):
     def __init__(self,track, exercise_list, cnt_list, set_list, breaktime_list):
         super().__init__()  # don't forget this!
         self.track = track
-        self.detector = pm.poseDetector(
-            model_dir='./model/all_model/body_language_mlp.pkl')
-        self.pTime = 0
+        self.detector = pm.poseDetector()
         self.cnt = 0
         self.drop = -1
         self.set_list = list(map(int,set_list.split(",")))
@@ -53,13 +39,10 @@ class VideoTransformTrack(MediaStreamTrack):
         self.finish_time = time.time()
         self.goodjob_time = time.time()
         self.plank_time = "None"
-
         self.posture = "None"
         self.preposture = "None"
-
         self.goal = list(map(int, self.cnt_list))
         self.flow = -1
-        # self.model="None"
         with open(f'./model/{str(self.exercise_list[0])}_model/body_language_mlp.pkl', 'rb') as f:
             self.model = pickle.load(f)
         self.status = "None"
@@ -68,13 +51,12 @@ class VideoTransformTrack(MediaStreamTrack):
         self.sports = ""
         self.SPORTS = ""
         self.time = 3
-
         self.label_d=""
         self.label_u=""
         self.channel=None
         self.progress={}
         self.progress['exercise']=self.exercise_list
-        self.progress['cnt']=self.cnt_list
+        self.progress['cnt']=self.goal
         self.progress['set']=[0]*len(self.cnt_list)
         self.progress['exit']=1
     async def recv(self):
@@ -182,7 +164,7 @@ class VideoTransformTrack(MediaStreamTrack):
                     self.cnt = 0
                 ##현재 정해진 운동 완료하면 자동으로 record로 가는데, 계속 띄워놓고 싶으면 이걸로
                 # if self.flow == 6:
-                    # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
+                    # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",105,50,6,7)
                         
                 if self.flow == 6 and time.time()-self.goodjob_time < self.time:
                     img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
