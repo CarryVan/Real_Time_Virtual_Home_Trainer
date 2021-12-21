@@ -196,8 +196,7 @@ class VideoTransformTrack2(MediaStreamTrack):
             self.output_details = self.model.get_output_details()
         except Exception as e:
             print(e)
-        self.class_number = {8: 'legraise_u', 9: 'legraise_d', 20: 'lunge_d', 21: 'lunge_u', 27: 'plank_u', 36: 'pushup_d', 37: 'pushup_u', 
-        59: 'sitting_u', 42: 'situp_u', 43: 'situp_d', 52: 'squat_d', 53: 'squat_u', 61: 'walking_u', 0: 'none_u'}
+        self.class_number ={8: 'legraise_u', 9: 'legraise_d', 20: 'lunge_d', 21: 'lunge_u', 27: 'plank_u', 36: 'pushup_d', 37: 'pushup_u', 59: 'sitting_u', 42: 'situp_u', 43: 'situp_d', 52: 'squat_d', 53: 'squat_u', 61: 'walking_u', 0: 'none_u'}
                            
         self.detector = pm.poseDetector(
             model_dir='./model/all_model/body_language_mlp.pkl')
