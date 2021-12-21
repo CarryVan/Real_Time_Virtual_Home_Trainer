@@ -198,16 +198,16 @@ function start() {
 	sets = document.getElementsByClassName('set')
 	breaktimes = document.getElementsByClassName('time')
 
-	for (var i=0; i < exercises.length; i++){
+	for (var i=1; i < exercises.length; i++){
 		exercise_list.push(exercises[i].value)
 	}
-	for (var i=0; i < cnts.length; i++){
+	for (var i=1; i < cnts.length; i++){
 		cnt_list.push(cnts[i].value)
 	}
-	for (var i=0; i < sets.length; i++){
+	for (var i=1; i < sets.length; i++){
 		set_list.push(sets[i].value)
 	}
-	for (var i=0; i< breaktimes.length; i++){
+	for (var i=1; i< breaktimes.length; i++){
 		breaktime_list.push(breaktimes[i].value)
 	}
 
