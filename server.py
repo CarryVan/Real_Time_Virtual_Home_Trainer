@@ -31,7 +31,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from src.schemas import Offer, Info
-from VideoTransformTrack import VideoTransformTrack, AudioTransformTrack, VideoTransformTrack2
+from VideoTransformTrack import VideoTransformTrack,VideoTransformTrack2
 from src.schemas import Offer, Live
 ROOT = os.path.dirname(__file__)
 
@@ -52,8 +52,6 @@ templates = Jinja2Templates(directory="templates")
 
 logger = logging.getLogger("pc")
 pcs = set()
-
-finish = False
 
 @app.get("/", response_class=HTMLResponse)
 async def pose_eatimation(request: Request):
@@ -98,13 +96,10 @@ async def offer(params: Offer):
     offer = RTCSessionDescription(sdp=params.sdp, type=params.type)
     pc = RTCPeerConnection()
     
-
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
     pcs.add(pc)
     
-    player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
     recorder = MediaBlackhole()
-    
 
     @pc.on("iceconnectionstatechange")
     async def on_iceconnectionstatechange():
@@ -114,11 +109,7 @@ async def offer(params: Offer):
 
     @pc.on("track")
     def on_track(track):
-        if track.kind == "audio":
-            # pass
-            pc.addTrack(player.audio)
-            recorder.addTrack(track)
-        elif track.kind == "video":
+        if track.kind == "video":
             global local_video
             local_video = VideoTransformTrack(
                 track, exercise_list=params.exercise, cnt_list=params.cnt, set_list=params.set, breaktime_list=params.breaktime
@@ -201,7 +192,6 @@ async def offer(params: Live):
     pcs.add(pc)
 
     # prepare local media
-    player = MediaPlayer(os.path.join(ROOT, "workout_start.wav"))
     recorder = MediaBlackhole()
 
     @pc.on("datachannel")
@@ -219,11 +209,8 @@ async def offer(params: Live):
 
     @pc.on("track")
     def on_track(track):
-        if track.kind == "audio":
-            local_audio = AudioTransformTrack(track)
-        elif track.kind == "video":
+        if track.kind == "video":
             global local_video
-
             local_video = VideoTransformTrack2(track)
             pc.addTrack(local_video)
             recorder.addTrack(track)
@@ -254,8 +241,6 @@ async def on_shutdown(app):
     coros = [pc.close() for pc in pcs]
     await asyncio.gather(*coros)
     pcs.clear()
-
-
 if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",

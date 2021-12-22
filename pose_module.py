@@ -36,85 +36,69 @@ class poseDetector:
         self.status = 'pushup_x'
         self.joint = [8, 0, 7, 9, 10, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
         self.joint2 = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]
-        # with open(f'{model_dir}', 'rb') as f:
-            # self.model = pickle.load(f)
 
     
     def drawTitle(self,img,title,size,y):
         
         width,height=img.size
-        try: 
-            draw = ImageDraw.Draw(img)
-            font=ImageFont.truetype("font/GodoM.ttf",size)
-            text=str(title)
-            w,h=draw.textsize(text,font=font)
-            
-            if y==0:
-                org=((width-w)//2,(height-h)//2-h)
-            elif y==1:
-                org=((width-w)//2,(height-h)//2+h)
-            elif y==3:
-                org=((width-w)//2,(height-h)//2-h*2.5)
-            elif y==4:
-                org=((width-w)//2,(height-h)//2-1.5*h)
-            elif y==5:
-                org=((width-w*2.5),(h))
-            elif y==6:
-                org=((width-w)//2,(height-h)//2-h*0.5)
-            elif y==7:
-                org=((width-w)//2,(height-h)//2+h*1.5)
-
-
-            draw.text(org,text,font=font,fill=(255,255,255))
-        except Exception as e:
-            pass
+        draw = ImageDraw.Draw(img)
+        font=ImageFont.truetype("font/GodoM.ttf",size)
+        text=str(title)
+        w,h=draw.textsize(text,font=font)
+        
+        if y==0:
+            org=((width-w)//2,(height-h)//2-h)
+        elif y==1:
+            org=((width-w)//2,(height-h)//2+h)
+        elif y==3:
+            org=((width-w)//2,(height-h)//2-h*2.5)
+        elif y==4:
+            org=((width-w)//2,(height-h)//2-1.5*h)
+        elif y==5:
+            org=((width-w*2.5),(h))
+        elif y==6:
+            org=((width-w)//2,(height-h)//2-h*0.5)
+        elif y==7:
+            org=((width-w)//2,(height-h)//2+h*1.5)
+        draw.text(org,text,font=font,fill=(255,255,255))
         return img
     def title(self, img,title,plus,size1=85,size2=85,y1=0,y2=1):
         img.flags.writeable = True
         img = Image.fromarray(img)
-        try:
-            img = self.drawTitle(img,title,size1,y1)
-            img=self.drawTitle(img, plus, size2, y2)
-        except Exception as e:
-            pass
+        img = self.drawTitle(img,title,size1,y1)
+        img=self.drawTitle(img, plus, size2, y2)
         img = np.array(img)
         return img
 
     def set_posture(self,img,idxx,model,first,preposture,location,y,x=None):
+        height, width, c = img.shape
+        src=cv2.imread(location,cv2.IMREAD_UNCHANGED)
+        sh0,sw0,c=src.shape
+        ratio=sw0/sh0
+        src=cv2.resize(src,(int(width//2+(width//8)*ratio),int(height//2+(1-ratio)*(height//8))))
+        sh,sw,c=src.shape
+        overlay_alpha=src[:,:,:3]/255.0
+        background_alpha = 1.0 -overlay_alpha
+        x=(width-sw)//2
+        y=int(height-sh*1.1)
+        img.flags.writeable = True
+        empty_img=img
+        results = self.pose.process(empty_img)
+        img[y:y+sh,x:x+sw]=overlay_alpha*src[:,:,:3]+background_alpha*img[y:y+sh,x:x+sw]
         try:
-            height, width, c = img.shape
-            src=cv2.imread(location,cv2.IMREAD_UNCHANGED)
-            sh0,sw0,c=src.shape
-            ratio=sw0/sh0
-            src=cv2.resize(src,(int(width//2+(width//8)*ratio),int(height//2+(1-ratio)*(height//8))))
-            sh,sw,c=src.shape
-            overlay_alpha=src[:,:,:3]/255.0
-            background_alpha = 1.0 -overlay_alpha
-            x=(width-sw)//2
-            y=int(height-sh*1.1)
-            img.flags.writeable = True
-            empty_img=img
-            results = self.pose.process(empty_img)
-            img[y:y+sh,x:x+sw]=overlay_alpha*src[:,:,:3]+background_alpha*img[y:y+sh,x:x+sw]
-            try:
-                psland=results.pose_landmarks
-                if psland!= None:
-                    landmarks = psland.landmark
-                joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
-                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
-                if len(joint_cnt) < 5:
-                    raise Exception
-                # X = pd.DataFrame([pose_row])
-                first = model.predict([pose_row])[0]
-            except Exception as e:
-                print(e)
-            
-            img = Image.fromarray(empty_img)
-            img=self.drawTitle(img, "준비 자세를", 45, 3)
-            img=self.drawTitle(img, "취해주세요" , 45, 4)
+            psland=results.pose_landmarks
+            if psland!= None:
+                landmarks = psland.landmark
+            joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
+            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+            if len(joint_cnt) < 5:
+                raise Exception
+            first = model.predict([pose_row])[0]
         except Exception as e:
             pass
-
+        img = Image.fromarray(empty_img)
+        img=self.drawTitle(img, "준비 자세를", 45, 3)
+        img=self.drawTitle(img, "취해주세요" , 45, 4)
         img = np.array(img)
         return img,first
     def exercise(self,img,idxx,model,status,label_d,label_u,preposture,cnt,goal,start_time=None):
@@ -135,7 +119,6 @@ class poseDetector:
             joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
             pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
                 
-            # X = pd.DataFrame([pose_row])
             body_language_class = model.predict([pose_row])[0]
             if idxx==11:
                 if status == label_d and body_language_class == label_u:
@@ -153,9 +136,6 @@ class poseDetector:
                 if status == label_d and body_language_class == label_u:
                     cnt +=1
             status = body_language_class
-            #우리 확인용
-            cv2.putText(empty_img, body_language_class, (30, 200), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv2.LINE_AA)    
             
             img = Image.fromarray(empty_img)
             self.drawTitle(img, str(cnt) , 65, 5)
@@ -169,14 +149,11 @@ class poseDetector:
                 return img, status, cnt 
             
         except Exception as e:
-            try:
-                img = Image.fromarray(empty_img)
-                self.drawTitle(img, str(cnt) , 65, 5)
-                img = np.array(img)
-                cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
-                cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
-            except Exception as e:
-                pass
+            img = Image.fromarray(empty_img)
+            self.drawTitle(img, str(cnt) , 65, 5)
+            img = np.array(img)
+            cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
+            cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
             if idxx==11:
                 return img, status, cnt , start_time    
             else:
@@ -184,12 +161,9 @@ class poseDetector:
     def complete_sports(self,img,cnt,goal):
         img.flags.writeable = True
         height,width,c=img.shape
-        try:
-            img = Image.fromarray(img)
-            self.drawTitle(img, str(cnt) , 65, 5)
-            img = np.array(img)
-        except Exception as e:
-            pass
+        img = Image.fromarray(img)
+        self.drawTitle(img, str(cnt) , 65, 5)
+        img = np.array(img)
         prog=int(width*0.9)
 
         margin=int(width*0.1)

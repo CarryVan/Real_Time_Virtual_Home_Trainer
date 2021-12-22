@@ -81,7 +81,7 @@ function removeList(ths){
 var pc = null;
 
 // data channel
-var dc = null, dcInterval = null;
+var channel = null;
 var count=''
 
 function createPeerConnection() {
@@ -96,14 +96,19 @@ function createPeerConnection() {
 
 	pc = new RTCPeerConnection(config);
 	
-	var channel = pc.createDataChannel("chat");
+	channel = pc.createDataChannel("chat");
 	channel.onopen = function(event) {
 	channel.send('Hi you!');
 	}
 	
 	channel.onmessage = function(event) {
+<<<<<<< HEAD
 		data=event.data
 		
+=======
+		count=event.data
+		localStorage.setItem("count",count)
+>>>>>>> bcf2e1b2ac371f21a7db506dde22496c952f7330
 		if(event.data.includes("finish")){
 			stop(data);
 		}
@@ -379,7 +384,6 @@ function sdpFilterCodec(kind, codec, realSdp) {
             sdp += lines[i] + '\n';
         }
     }
-
     return sdp;
 }
 
