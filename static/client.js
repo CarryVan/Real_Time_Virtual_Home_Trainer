@@ -105,7 +105,7 @@ function createPeerConnection() {
 	
 	channel.onmessage = function(event) {
 		data=event.data
-		data = JSON.parse(data)
+		// data = JSON.parse(data)
 		
 		console.log(data)
 		if(event.data.includes("finish")){
