@@ -39,12 +39,6 @@ class VideoTransformTrack(MediaStreamTrack):
         self.finish_time = time.time()
         self.goodjob_time = time.time()
         self.plank_time = "None"
-<<<<<<< HEAD
-
-        print(f"exercise_list: {exercise_list}, breaktime_list: {breaktime_list}")
-
-=======
->>>>>>> bcf2e1b2ac371f21a7db506dde22496c952f7330
         self.posture = "None"
         self.preposture = "None"
         self.goal = list(map(int, self.cnt_list))
@@ -170,11 +164,7 @@ class VideoTransformTrack(MediaStreamTrack):
                     self.cnt = 0
                 ##현재 정해진 운동 완료하면 자동으로 record로 가는데, 계속 띄워놓고 싶으면 이걸로
                 # if self.flow == 6:
-<<<<<<< HEAD
-                #     img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",100,50,6,7)
-=======
                     # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",105,50,6,7)
->>>>>>> bcf2e1b2ac371f21a7db506dde22496c952f7330
                         
                 if self.flow == 6 and time.time()-self.goodjob_time < self.time:
                     img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)

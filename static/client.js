@@ -1,3 +1,5 @@
+const { data } = require("jquery");
+
 function removebtn(){
 	const btnElement = document.getElementById('btn_x');
 	const remove_layer = document.getElementsByClassName("work_out_selection")
@@ -102,17 +104,13 @@ function createPeerConnection() {
 	}
 	
 	channel.onmessage = function(event) {
-<<<<<<< HEAD
 		data=event.data
+		data = JSON.parse(data)
 		
-=======
-		count=event.data
-		localStorage.setItem("count",count)
->>>>>>> bcf2e1b2ac371f21a7db506dde22496c952f7330
+		console.log(data)
 		if(event.data.includes("finish")){
-			stop(data);
+			stop();
 		}
-		
 	}
 	// register some listeners to help debugging
 	pc.addEventListener('icegatheringstatechange', function() {
@@ -393,10 +391,10 @@ function escapeRegExp(string) {
 function record(){
 	console.log(localStorage.getItem("count"))
 }
-function stop(data){
+function stop(){
 
-	data = JSON.parse(data)
-	// {"exercise": ["squat", "pushup"], "cnt": [1, 1], "set": [1, 0], "exit": 1}
+	// data = JSON.parse(data)
+
 	fetch("/save_workout", {
 		method: 'POST',
 		headers: {
