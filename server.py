@@ -96,12 +96,10 @@ async def offer(params: Offer):
     offer = RTCSessionDescription(sdp=params.sdp, type=params.type)
     pc = RTCPeerConnection()
     
-
     pc_id = "PeerConnection(%s)" % uuid.uuid4()
     pcs.add(pc)
     
     recorder = MediaBlackhole()
-    
 
     @pc.on("iceconnectionstatechange")
     async def on_iceconnectionstatechange():
@@ -246,12 +244,3 @@ async def on_shutdown(app):
     coros = [pc.close() for pc in pcs]
     await asyncio.gather(*coros)
     pcs.clear()
-
-
-if __name__ == "__main__":
-    uvicorn.run("server:app",
-                host="0.0.0.0",
-                port=8080,
-                ssl_keyfile="./localhost+2-key.pem",
-                ssl_certfile="./localhost+2.pem",
-                reload=True)
