@@ -136,9 +136,6 @@ class poseDetector:
                 if status == label_d and body_language_class == label_u:
                     cnt +=1
             status = body_language_class
-            #우리 확인용
-            cv2.putText(empty_img, body_language_class, (30, 200), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv2.LINE_AA)    
             
             img = Image.fromarray(empty_img)
             self.drawTitle(img, str(cnt) , 65, 5)
