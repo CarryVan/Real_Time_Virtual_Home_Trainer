@@ -42,6 +42,7 @@ class poseDetector:
         
         width,height=img.size
         draw = ImageDraw.Draw(img)
+        fontsize=1
         font=ImageFont.truetype("font/GodoM.ttf",size)
         text=str(title)
         w,h=draw.textsize(text,font=font)
@@ -70,7 +71,7 @@ class poseDetector:
         img = np.array(img)
         return img
 
-    def set_posture(self,img,idxx,model,first,preposture,location,y,x=None):
+    def set_posture(self,img,drop,results,idxx,model,first,preposture,location,y,x=None):
         height, width, c = img.shape
         src=cv2.imread(location,cv2.IMREAD_UNCHANGED)
         sh0,sw0,c=src.shape
@@ -83,25 +84,27 @@ class poseDetector:
         y=int(height-sh*1.1)
         img.flags.writeable = True
         empty_img=img
-        results = self.pose.process(empty_img)
         img[y:y+sh,x:x+sw]=overlay_alpha*src[:,:,:3]+background_alpha*img[y:y+sh,x:x+sw]
-        try:
-            psland=results.pose_landmarks
-            if psland!= None:
-                landmarks = psland.landmark
-            joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
-            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
-            if len(joint_cnt) < 5:
-                raise Exception
-            first = model.predict([pose_row])[0]
-        except Exception as e:
-            pass
+
+        if drop%4==0:
+            results = self.pose.process(empty_img)
+            try:
+                psland=results.pose_landmarks
+                if psland!= None:
+                    landmarks = psland.landmark
+                joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
+                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+                if len(joint_cnt) < 5:
+                    raise Exception
+                first = model.predict([pose_row])[0]
+            except Exception as e:
+                pass
         img = Image.fromarray(empty_img)
         img=self.drawTitle(img, "준비 자세를", 45, 3)
         img=self.drawTitle(img, "취해주세요" , 45, 4)
         img = np.array(img)
-        return img,first
-    def exercise(self,img,idxx,model,status,label_d,label_u,preposture,cnt,goal,start_time=None):
+        return img,first,results
+    def exercise(self,img,drop,results,idxx,model,status,label_d,label_u,preposture,cnt,goal,start_time=None):
         img.flags.writeable = True
         height,width,c=img.shape
         prog=int(width*0.9)
@@ -109,55 +112,59 @@ class poseDetector:
         margin=int(width*0.1)
         pad=int(height*0.85)
         empty_img=img
-        results = self.pose.process(empty_img)
-        self.mpDraw.draw_landmarks(empty_img, results.pose_landmarks,
-                                           self.mpPose.POSE_CONNECTIONS)
-        try:
-            # Extract Pose landmarks
-            
-            landmarks = results.pose_landmarks.landmark
-            joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
-            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+        if drop%4==0:
+            results = self.pose.process(empty_img)
+            self.mpDraw.draw_landmarks(empty_img, results.pose_landmarks,
+                                            self.mpPose.POSE_CONNECTIONS)
+            try:
+                # Extract Pose landmarks
                 
-            body_language_class = model.predict([pose_row])[0]
-            if idxx==11:
-                if status == label_d and body_language_class == label_u:
-                    start_time =time.time()
-                elif status == label_u and body_language_class == label_u:
-                    end_time = time.time()
-                    if start_time=="None":
-                        start_time=end_time
+                landmarks = results.pose_landmarks.landmark
+                joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
+                pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
+                    
+                body_language_class = model.predict([pose_row])[0]
+                if idxx==11:
+                    if status == label_d and body_language_class == label_u:
+                        start_time =time.time()
+                    elif status == label_u and body_language_class == label_u:
+                        end_time = time.time()
+                        if start_time=="None":
+                            start_time=end_time
 
-                    total_time = end_time - start_time
-                    if int(total_time) >=1:
-                        cnt += 1
-                        start_time = time.time()
-            else:
-                if status == label_d and body_language_class == label_u:
-                    cnt +=1
-            status = body_language_class
+                        total_time = end_time - start_time
+                        if int(total_time) >=1:
+                            cnt += 1
+                            start_time = time.time()
+                else:
+                    if status == label_d and body_language_class == label_u:
+                        cnt +=1
+                status = body_language_class
+
+            except Exception as e:
+                pass
+        img = Image.fromarray(empty_img)
+        self.drawTitle(img, str(cnt) , 65, 5)
+        img = np.array(img)
+        
+        cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
+        cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
+        if idxx==11:
             
-            img = Image.fromarray(empty_img)
-            self.drawTitle(img, str(cnt) , 65, 5)
-            img = np.array(img)
+            return img, status, cnt , start_time ,results   
+        else:
+            return img, status, cnt ,results
             
-            cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
-            cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
-            if idxx==11:
-                return img, status, cnt , start_time    
-            else:
-                return img, status, cnt 
-            
-        except Exception as e:
-            img = Image.fromarray(empty_img)
-            self.drawTitle(img, str(cnt) , 65, 5)
-            img = np.array(img)
-            cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
-            cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
-            if idxx==11:
-                return img, status, cnt , start_time    
-            else:
-                return img, status, cnt 
+        # except Exception as e:
+        #     img = Image.fromarray(empty_img)
+        #     self.drawTitle(img, str(cnt) , 65, 5)
+        #     img = np.array(img)
+        #     cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
+        #     cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
+        #     if idxx==11:
+        #         return img, status, cnt , start_time    
+        #     else:
+        #         return img, status, cnt 
     def complete_sports(self,img,cnt,goal):
         img.flags.writeable = True
         height,width,c=img.shape
