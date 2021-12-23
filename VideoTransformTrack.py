@@ -264,21 +264,16 @@ class VideoTransformTrack2(MediaStreamTrack):
                 try:
                     if self.channel is not None :
                         self.channel.send(
-                            # json.dumps(self.workout_cnt)
                             json.dumps(self.progress)
                         )
-                    print(self.progress)
                 except Exception as e:
                     print(e)
-            
             
             for i in self.key:
                 if self.workout_cnt[i] != 0:
                     self.cnt += 30
                     self.workout[i] = self.cnt
                     self.key.remove(i)
-
-              
                     
 
             cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, self.workout['pushup']), 
