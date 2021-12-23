@@ -47,6 +47,8 @@ class poseDetector:
         text=str(title)
 
         font=ImageFont.truetype("font/GodoM.ttf",fontsize)
+        if width<height:
+            img_fraction*=0.5
         while font.getsize(text)[1]<img_fraction*img.size[1]:
             fontsize +=1
             font = ImageFont.truetype("font/GodoM.ttf",fontsize)
@@ -109,7 +111,6 @@ class poseDetector:
         img=self.drawTitle(img, "취해주세요" , 0.15, 4,sh)
         img = np.array(img)
         return img,first,results
-
     def exercise(self,img,drop,results,idxx,model,status,label_d,label_u,preposture,cnt,goal,start_time=None):
         img.flags.writeable = True
         height,width,c=img.shape
@@ -122,11 +123,11 @@ class poseDetector:
             
             try:
                 # Extract Pose landmarks
+                
                 landmarks = results.pose_landmarks.landmark
                 joint_cnt = [landmark.visibility for idx, landmark in enumerate(landmarks) if landmark.visibility > 0.5 and idx in self.joint]
                 pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for idx, landmark in enumerate(landmarks) if idx in self.joint]).flatten())
-                if len(joint_cnt) < 5:
-                    raise Exception
+                    
                 body_language_class = model.predict([pose_row])[0]
                 if idxx==11:
                     if status == label_d and body_language_class == label_u:
