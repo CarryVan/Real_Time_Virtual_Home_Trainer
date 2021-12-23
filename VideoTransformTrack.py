@@ -223,7 +223,7 @@ class VideoTransformTrack2(MediaStreamTrack):
             img = frame.to_ndarray(format="bgr24")
             
             # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            # img = cv2.flip(img, 1)
+            img = cv2.flip(img, 1)
             
             if self.drop % 3 == 0:
                 self.drop = 0
