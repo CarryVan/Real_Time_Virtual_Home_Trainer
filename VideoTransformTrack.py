@@ -267,6 +267,7 @@ class VideoTransformTrack2(MediaStreamTrack):
                             # json.dumps(self.workout_cnt)
                             json.dumps(self.progress)
                         )
+                    print(self.progress)
                 except Exception as e:
                     print(e)
             
