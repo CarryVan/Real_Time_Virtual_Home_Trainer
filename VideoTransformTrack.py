@@ -278,9 +278,6 @@ class VideoTransformTrack2(MediaStreamTrack):
                     self.workout[i] = self.cnt
                     self.key.remove(i)
 
-              
-                    
-
             cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, self.workout['pushup']), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA) 
             cv2.putText(img, 'lunge' + str(self.workout_cnt['lunge']), (30, self.workout['lunge']), 

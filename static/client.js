@@ -397,7 +397,6 @@ function record(){
 }
 function stop(){
 
-	
 	fetch("/save_workout", {
 		method: 'POST',
 		headers: {
