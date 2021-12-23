@@ -4,3 +4,4 @@ venv
 *.log
 .vscode/
 .editorconfig
+.sql_app.db
