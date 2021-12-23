@@ -67,7 +67,7 @@ class VideoTransformTrack(MediaStreamTrack):
             # pose estimate
             img = frame.to_ndarray(format="bgr24")
             # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            # img = cv2.flip(img, 0)
+            img = cv2.flip(img, 1)
             if self.i < len(self.exercise_list):
                 if self.flow == -1:
                     self.start_time = time.time()
