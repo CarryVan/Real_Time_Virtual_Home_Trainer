@@ -194,12 +194,6 @@ async def offer(params: Live):
     # prepare local media
     recorder = MediaBlackhole()
 
-    @pc.on("datachannel")
-    def on_datachannel(channel):
-        @channel.on("message")
-        def on_message(message):
-            if isinstance(message, str) and message.startswith("ping"):
-                channel.send("pong" + message[4:])
 
     @pc.on("iceconnectionstatechange")
     async def on_iceconnectionstatechange():
@@ -241,9 +235,3 @@ async def on_shutdown(app):
     coros = [pc.close() for pc in pcs]
     await asyncio.gather(*coros)
     pcs.clear()
-    
-if __name__ == "__main__":
-    uvicorn.run("server:app",
-                host="0.0.0.0",
-                port=8080,
-                reload=True)

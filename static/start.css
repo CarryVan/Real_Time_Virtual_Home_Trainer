@@ -1,0 +1,16 @@
+.btn_stop{
+    position:absolute;
+    top:5%;
+    margin-left: -5%;
+    font-size: 25px;
+
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    overflow: hidden;
+    outline: none;
+    color: white;
+    font-weight: bolder;
+    border-radius: 50px;
+  }
+ 

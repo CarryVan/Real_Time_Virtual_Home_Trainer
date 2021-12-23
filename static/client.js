@@ -102,8 +102,9 @@ function createPeerConnection() {
 	}
 	
 	channel.onmessage = function(event) {
-
 		data=event.data
+		console.log(data)
+
 		if (data != 'msg'){
 			data = JSON.parse(data)
 			localStorage.setItem("exercise", data.exercise)
@@ -229,20 +230,20 @@ function start_camera(){
 
 	var constraints = {
 			audio: false,
-			video: false,
+			video: true,
 	};
 
-	var resolution = "700x400";
-	if (resolution) {
-			resolution = resolution.split('x');
-			constraints.video = {
-					width: parseInt(window.innerHeight, 0),
-					height: parseInt(window.innerWidth, 0),
-					facingMode: "user",
-			};
-	} else {
-			constraints.video = true;
-	}
+	// var resolution = "700x400";
+	// if (resolution) {
+	// 		resolution = resolution.split('x');
+	// 		constraints.video = {
+	// 				width: parseInt(window.innerHeight, 0),
+	// 				height: parseInt(window.innerWidth, 0),
+	// 				facingMode: "user",
+	// 		};
+	// } else {
+	// 		constraints.video = true;
+	// }
 
 	if (constraints.video) {
 		document.getElementById('media').style.display = 'block';
@@ -304,20 +305,20 @@ function live_camera(){
 
 	var constraints = {
 			audio: false,
-			video: false,
+			video: true,
 	};
 
-	var resolution = "700x400";
-	if (resolution) {
-			resolution = resolution.split('x');
-			constraints.video = {
-					width: parseInt(window.innerHeight, 0),
-					height: parseInt(window.innerWidth, 0),
-					facingMode: "user",
-			};
-	} else {
-			constraints.video = true;
-	}
+	// var resolution = "700x400";
+	// if (resolution) {
+	// 		resolution = resolution.split('x');
+	// 		constraints.video = {
+	// 				width: parseInt(window.innerHeight, 0),
+	// 				height: parseInt(window.innerWidth, 0),
+	// 				facingMode: "user",
+	// 		};
+	// } else {
+	// 		constraints.video = true;
+	// }
 
 	if (constraints.video) {
 		document.getElementById('media').style.display = 'block';
