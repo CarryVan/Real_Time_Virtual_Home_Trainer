@@ -45,7 +45,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.flow = -1
         with open(f'./model/{str(self.exercise_list[0])}_model/body_language_mlp.pkl', 'rb') as f:
             self.model = pickle.load(f)
-        self.status = "None"
+        self.status = ""
         self.i = 0
         self.idxx = 10
         self.sports = ""
@@ -63,9 +63,6 @@ class VideoTransformTrack(MediaStreamTrack):
     async def recv(self):
         self.drop += 1
         frame = await self.track.recv()
-        # if self.drop % 3 == 0:
-        # self.drop = 0
-        # pose estimate
         img = frame.to_ndarray(format="bgr24")
         img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         img = cv2.flip(img, 0)
@@ -104,29 +101,26 @@ class VideoTransformTrack(MediaStreamTrack):
                 self.flow = 2
             
             if self.flow == 2 and self.cnt < self.goal[self.i]:
-                try:
-                    if self.idxx == 11:
-                        img, self.status, self.cnt, self.plank_time,self.results = self.detector.exercise(
-                            img, self.drop,self.results,self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i], self.plank_time)
-                    else:
-                        img, self.status, self.cnt,self.results = self.detector.exercise(
-                            img, self.drop,self.results,self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i])
-                        self.finish_time = time.time()
-                except Exception as e:
-                    print(e)
+                if self.idxx == 11:
+                    img, self.status, self.cnt, self.plank_time,self.results = self.detector.exercise(
+                        img, self.drop,self.results,self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i], self.plank_time)
+                else:
+                    img, self.status, self.cnt,self.results = self.detector.exercise(
+                        img, self.drop,self.results,self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i])
+                    self.finish_time = time.time()
                 
             elif self.flow == 2 and self.cnt >= self.goal[self.i]:
                 self.flow = 3
             if self.flow == 3 and time.time()-self.finish_time < 0.8:
                 img = self.detector.complete_sports(
-                    img, self.cnt, self.goal[self.i])
+                    img, self.status,self.cnt, self.goal[self.i])
                 self.break_time = time.time()
                 self.progress['set'][self.i]=self.pre_set
                 if self.channel is not None:
                     self.channel.send(
                         json.dumps(self.progress)
                     )
-            elif self.flow == 3 and time.time() - self.finish_time >= 0.8:
+            elif self.flow == 3 and time.time() - self.finish_time >= 0.6:
                 
                 if self.i == len(self.exercise_list)-1 and self.pre_set==self.set_list[self.i]:
                     self.flow = 6
@@ -162,12 +156,9 @@ class VideoTransformTrack(MediaStreamTrack):
                 self.flow = -1
                 self.posture = "None"
                 self.cnt = 0
-            ##현재 정해진 운동 완료하면 자동으로 record로 가는데, 계속 띄워놓고 싶으면 이걸로
-            # if self.flow == 6:
-                # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",105,50,6,7)
-                    
+            
             if self.flow == 6 and time.time()-self.goodjob_time < self.time:
-                img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
+                img = self.detector.title(img, "Excellent", "내일 또 만나요",0.22,0.16,0,1)
             elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
                 self.progress['finish']=1
                 if self.channel is not None:
@@ -180,8 +171,6 @@ class VideoTransformTrack(MediaStreamTrack):
         self.before_frame = new_frame
         
         return new_frame
-        # else:
-        #     return self.before_frame
 
 class VideoTransformTrack2(MediaStreamTrack):
     

@@ -38,32 +38,37 @@ class poseDetector:
         self.joint2 = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]
 
     
-    def drawTitle(self,img,title,size,y):
-        
+    def drawTitle(self,img,title,img_fraction,y,posture_size=0):
+        if title=="":
+            return img
         width,height=img.size
         draw = ImageDraw.Draw(img)
         fontsize=1
-        font=ImageFont.truetype("font/GodoM.ttf",size)
         text=str(title)
+
+        font=ImageFont.truetype("font/GodoM.ttf",fontsize)
+        while font.getsize(text)[1]<img_fraction*img.size[1]:
+            fontsize +=1
+            font = ImageFont.truetype("font/GodoM.ttf",fontsize)
+        fontsize-=1
+        font=ImageFont.truetype("font/GodoM.ttf",fontsize)
         w,h=draw.textsize(text,font=font)
-        
         if y==0:
             org=((width-w)//2,(height-h)//2-h)
         elif y==1:
             org=((width-w)//2,(height-h)//2+h)
         elif y==3:
-            org=((width-w)//2,(height-h)//2-h*2.5)
+            org=((width-w)//2,(height-posture_size-h)//2-0.6*h)
         elif y==4:
-            org=((width-w)//2,(height-h)//2-1.5*h)
+            org=((width-w)//2,(height-posture_size-h)//2+0.6*h)
         elif y==5:
             org=((width-w*2.5),(h))
         elif y==6:
-            org=((width-w)//2,(height-h)//2-h*0.5)
-        elif y==7:
-            org=((width-w)//2,(height-h)//2+h*1.5)
+            org=((h),(h))
+        
         draw.text(org,text,font=font,fill=(255,255,255))
         return img
-    def title(self, img,title,plus,size1=85,size2=85,y1=0,y2=1):
+    def title(self, img,title,plus,size1=0.2,size2=0.2,y1=0,y2=1):
         img.flags.writeable = True
         img = Image.fromarray(img)
         img = self.drawTitle(img,title,size1,y1)
@@ -100,22 +105,20 @@ class poseDetector:
             except Exception as e:
                 pass
         img = Image.fromarray(empty_img)
-        img=self.drawTitle(img, "준비 자세를", 45, 3)
-        img=self.drawTitle(img, "취해주세요" , 45, 4)
+        img=self.drawTitle(img, "준비 자세를", 0.15, 3,sh)
+        img=self.drawTitle(img, "취해주세요" , 0.15, 4,sh)
         img = np.array(img)
         return img,first,results
     def exercise(self,img,drop,results,idxx,model,status,label_d,label_u,preposture,cnt,goal,start_time=None):
         img.flags.writeable = True
         height,width,c=img.shape
         prog=int(width*0.9)
-
         margin=int(width*0.1)
         pad=int(height*0.85)
         empty_img=img
         if drop%4==0:
             results = self.pose.process(empty_img)
-            self.mpDraw.draw_landmarks(empty_img, results.pose_landmarks,
-                                            self.mpPose.POSE_CONNECTIONS)
+            
             try:
                 # Extract Pose landmarks
                 
@@ -144,38 +147,46 @@ class poseDetector:
             except Exception as e:
                 pass
         img = Image.fromarray(empty_img)
-        self.drawTitle(img, str(cnt) , 65, 5)
+        self.drawTitle(img, str(cnt) , 0.15, 5)
+        post=""
+
+        if "plank_u" in status:
+            post="PLANK"
+        elif "_u" in status:
+            post="UP"
+        elif "_d" in status:
+            post ="DOWN"
+        self.drawTitle(img,post,0.15,6)
         img = np.array(img)
-        
-        cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
-        cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
+        thick=int(height*0.02)
+        cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),thick)
+        cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),thick)
         if idxx==11:
             
             return img, status, cnt , start_time ,results   
         else:
             return img, status, cnt ,results
-            
-        # except Exception as e:
-        #     img = Image.fromarray(empty_img)
-        #     self.drawTitle(img, str(cnt) , 65, 5)
-        #     img = np.array(img)
-        #     cv2.line(img,(margin+((prog-margin)//goal)*cnt,pad),(prog,pad),(220,220,220),7)
-        #     cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
-        #     if idxx==11:
-        #         return img, status, cnt , start_time    
-        #     else:
-        #         return img, status, cnt 
-    def complete_sports(self,img,cnt,goal):
+        
+    def complete_sports(self,img,status,cnt,goal):
         img.flags.writeable = True
         height,width,c=img.shape
         img = Image.fromarray(img)
-        self.drawTitle(img, str(cnt) , 65, 5)
-        img = np.array(img)
+        self.drawTitle(img, str(cnt) , 0.15, 5)
         prog=int(width*0.9)
 
         margin=int(width*0.1)
         pad=int(height*0.85)
-        cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),7)
+        thick=int(height*0.02)
+        post=""
+        if "plank_u" in status:
+            post="PLANK"
+        elif "_u" in status:
+            post="UP"
+        elif "_d" in status:
+            post ="DOWN"
+        self.drawTitle(img,post,0.15,6)
+        img = np.array(img)
+        cv2.line(img,(margin,pad),(margin+((prog-margin)//goal)*cnt,pad),(0,225,0),thick)
         return img
 
     def all_classify(self, img):
