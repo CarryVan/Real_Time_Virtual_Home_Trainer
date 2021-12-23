@@ -1,5 +1,3 @@
-const { data } = require("jquery");
-
 function removebtn(){
 	const btnElement = document.getElementById('btn_x');
 	const remove_layer = document.getElementsByClassName("work_out_selection")
@@ -104,10 +102,19 @@ function createPeerConnection() {
 	}
 	
 	channel.onmessage = function(event) {
+
 		data=event.data
-		// data = JSON.parse(data)
+		console.log("data: " ,data)
+		if (data != 'msg'){
+			data = JSON.parse(data)
+			console.log(data)
+			localStorage.setItem("exercise", data.exercise)
+			localStorage.setItem("cnt", data.cnt)
+			localStorage.setItem("set", data.set)
+			localStorage.setItem("exit", data.exit)
+		}
+			
 		
-		console.log(data)
 		if(event.data.includes("finish")){
 			stop();
 		}
@@ -393,22 +400,27 @@ function record(){
 }
 function stop(){
 
-	// data = JSON.parse(data)
+	console.log("exercise: " + localStorage.getItem("exercise"))
+	console.log("cnt: "+  localStorage.getItem("cnt"))
+	console.log("set: " + localStorage.getItem("set"))
+	console.log("breaktime: " + localStorage.getItem("breaktime"))
+	console.log("exit: " + localStorage.getItem("exit"))
 
+	
 	fetch("/save_workout", {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			exercise: data.exercise,
-			cnt: data.cnt,
-			set: data.set,
-			exit: data.exit
+			exercise: localStorage.getItem("exercise").split(','),
+			cnt: localStorage.getItem("cnt").split(','),
+			set: localStorage.getItem("set").split(','),
+			exit: localStorage.getItem("exit")
 		})
 	})
 	.then(response => response.json())
 	.then(data => console.log(data))
 	
-	location.href = "record.html";
+	//location.href = "record.html";
 }
