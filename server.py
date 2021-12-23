@@ -180,7 +180,8 @@ async def recent_workouts(db: Session = Depends(get_db)):
 
        workout_flow = crud.get_workout_flows_by_id(db, session.id)
        workout_flow.insert(0, session.date_time)
-       return_list.append(workout_flow)
+       if len(return_list) < 7:
+           return_list.append(workout_flow)
 
     return return_list
 @app.post("/offer2")

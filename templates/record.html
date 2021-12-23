@@ -29,46 +29,7 @@
     <main>
       <section class="home">
         <div id="frame" class="frame" >
-          <div class="card">
-            <div class="inner">
-              <div class="date">
-                <div id="t_11" class="title"></div>
-                <div id="t_12" class="dw"></div>
-              </div>
-              <div class="line"></div>
-              <div class="workout">
-                <ul id = "w_1">
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="inner">
-              <div class="date">
-                <div id="t_21" class="title"></div>
-                <div id="t_22" class="dw"></div>
-              </div>
-              <div class="line"></div>
-              <div class="workout">
-                <ul id = "w_2">
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="inner">
-              <div class="date">
-                <div id="t_31" class="title"></div>
-                <div id="t_32" class="dw"></div>
-              </div>
-              <div class="line"></div>
-              <div class="workout">
-                <ul id = "w_3">
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>   
+        </div>
       </section>
     </main>
   </body>
@@ -92,36 +53,65 @@
       })
       .then(response => response.json())
       .then(data => {
-        
+
         for (var i = 0; i < data.length; i++){
           
-          var t1 = document.getElementById("t_".concat(String(i+1), "1"))
-          var t2 = document.getElementById("t_".concat(String(i+1), "2"))
-          var w = document.getElementById("w_".concat(String(i+1)))
+         // var t1 = document.getElementById("t_".concat(String(i+1), "1"))
+          //var t2 = document.getElementById("t_".concat(String(i+1), "2"))
+          //var w = document.getElementById("w_".concat(String(i+1)))
 
-          date_time = data[i][0]
-          for (var j = 0; j < date_time.length; j++){
-            if (date_time[j] == "T"){
-              date_time = date_time.slice(5, j)
-            }
-          }
+          var frame = document.getElementById("frame")
+
+          var card = document.createElement("div")
+          var inner = document.createElement("div")
+          var date = document.createElement("div")
+          var t1 = document.createElement("div")
+          var t2 = document.createElement("div")
+          var line = document.createElement("div")
+          var workout = document.createElement("div")
+          var w = document.createElement("ul")
+
+          card.setAttribute('class', 'card')
+          inner.setAttribute('class', 'inner')
+          date.setAttribute('class', 'date')
+          t1.setAttribute('class', 'title')
+          t2.setAttribute('class', 'dw')
+          line.setAttribute('class', 'line')
+          workout.setAttribute('class', 'workout')
+          w.setAttribute('class', 'w')
 
           var li = []
 
           for (var j = 1; j < data[i].length; j++){
             var pt = data[i][j];
             var li = document.createElement("li");
-            var temp = ""
-            if (pt.workout_name != "break"){
-              temp = pt.workout_name.toUpperCase()+"  "+pt.count+"x"+pt.set;
-            }
+            var temp = pt.workout_name.toUpperCase()+"  "+pt.count+"x"+pt.set;
             const textNode = document.createTextNode(temp);
             li.appendChild(textNode);
             w.appendChild(li)
           }
+
+          date_time = data[i][0]
           dw=getDate(date_time)
+          
+          for (var j = 0; j < date_time.length; j++){
+            if (date_time[j] == "T"){
+              date_time = date_time.slice(5, j)
+            }
+          }
+          
           t1.innerHTML = date_time
           t2.innerHTML = dw
+          
+          card.appendChild(inner);
+          inner.appendChild(date);
+          inner.appendChild(line);
+          inner.appendChild(workout);
+          date.appendChild(t1)
+          date.appendChild(t2)
+          workout.appendChild(w)
+
+          frame.appendChild(card)
         }
         
       });

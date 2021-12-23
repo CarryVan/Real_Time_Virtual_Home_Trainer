@@ -188,20 +188,23 @@ nav .hamburger {
   }
 
   .home .frame{
-    height:80%;
+    height:70%;
     width:80%;
     background-color:rgba(0, 0, 0, 0.2);
+    top: -5vh;
     
-    display: flex;
+    position: relative;
+    overflow: auto;
+    /* display: flex;
     flex-direction: column;
-    justify-content:baseline;
-    align-items:flex-start;
+    align-items:flex-start; */
   }
 
   .home .frame .card{
+    position: relative;
     background-color:rgba(255, 255, 255, 0.9);
     border-radius: 5%;;
-    height:25%;
+    height:15vh;
     width:100%;
     border: 1px solid black;
     margin-bottom: 2vh;
