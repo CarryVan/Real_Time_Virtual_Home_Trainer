@@ -47,6 +47,8 @@ class poseDetector:
         text=str(title)
 
         font=ImageFont.truetype("font/GodoM.ttf",fontsize)
+        if width<height:
+            img_fraction*=0.5
         while font.getsize(text)[1]<img_fraction*img.size[1]:
             fontsize +=1
             font = ImageFont.truetype("font/GodoM.ttf",fontsize)
@@ -66,7 +68,7 @@ class poseDetector:
         elif y==6:
             org=((h),(h))
         
-        draw.text(org,text,font=font,fill=(255,255,255))
+        draw.text(org,text,font=font,fill=(0,0,0))
         return img
     def title(self, img,title,plus,size1=0.2,size2=0.2,y1=0,y2=1):
         img.flags.writeable = True

@@ -148,29 +148,26 @@ async def one(request: Request):
 @app.post("/save_workout")
 async def save_workout(params: Info, db: Session = Depends(get_db)):
     
-    exercise = params.exercise.split(",")
-    cnt = [int(x) for x in params.cnt.split(",")]
-    set = [int(x) for x in params.set.split(",")]
-    
-    breaktime = [int(x) for x in params.breaktime.split(",")]
+    exercise = params.exercise
+    cnt = params.cnt
+    set = params.set
+    exit = params.exit
 
+    crud.save_workout_session(db, exit)
     most_recent = crud.get_recent_session(db)
-    tot_len = len(exercise) + len(breaktime)
-
-    crud.save_workout_session(db)
 
     for i in range(len(exercise)):
         sw = SaveWorkout
-        sw.workout_session = int(most_recent.id) + 1
+        sw.workout_session = int(most_recent.id)
         sw.sequence = i
         
         sw.workout_name = exercise[i]
         sw.set = set[i]
         sw.count = cnt[i]
-        sw.breaktime = 0
-
-        crud.save_counted_workout(db, sw)
-    
+        
+        if int(sw.count) > 0:
+            crud.save_counted_workout(db, sw)
+ 
     return "saved!"
     
 @app.post("/workout_data")
@@ -183,7 +180,9 @@ async def recent_workouts(db: Session = Depends(get_db)):
 
        workout_flow = crud.get_workout_flows_by_id(db, session.id)
        workout_flow.insert(0, session.date_time)
-       return_list.append(workout_flow)
+       workout_flow.insert(1, session.exit)
+       if len(return_list) < 7:
+           return_list.append(workout_flow)
 
     return return_list
 @app.post("/offer2")
@@ -197,12 +196,6 @@ async def offer(params: Live):
     # prepare local media
     recorder = MediaBlackhole()
 
-    @pc.on("datachannel")
-    def on_datachannel(channel):
-        @channel.on("message")
-        def on_message(message):
-            if isinstance(message, str) and message.startswith("ping"):
-                channel.send("pong" + message[4:])
 
     @pc.on("iceconnectionstatechange")
     async def on_iceconnectionstatechange():
@@ -244,3 +237,9 @@ async def on_shutdown(app):
     coros = [pc.close() for pc in pcs]
     await asyncio.gather(*coros)
     pcs.clear()
+
+if __name__ == "__main__":
+    uvicorn.run("server:app",
+                host="0.0.0.0",
+                port=8080,
+                reload=True)

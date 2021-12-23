@@ -64,8 +64,8 @@ class VideoTransformTrack(MediaStreamTrack):
         self.drop += 1
         frame = await self.track.recv()
         img = frame.to_ndarray(format="bgr24")
-        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        img = cv2.flip(img, 0)
+        # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        img = cv2.flip(img, 1)
         if self.i < len(self.exercise_list):
             if self.flow == -1:
                 self.start_time = time.time()
@@ -205,7 +205,16 @@ class VideoTransformTrack2(MediaStreamTrack):
         self.key  = ['lunge', 'squat', 'legraise', 'plank', 'pushup', 'situp', 'dumbbell']
         self.cnt = 0
         self.channel=None
+        self.progress={}
+        self.progress['exercise']=['lunge','squat','legraise','plank','pushup','situp','dumbbell']
+        self.progress['cnt']=[0,0,0,0,0,0,0]
+        self.progress['set']=[0,0,0,0,0,0,0]
+        self.progress['exit']=0
+        self.cnt_list=[0,0,0,0,0,0,0]
+        self.index={'lunge':0,'squat':1,'legraise':2,'plank':3,'pushup':4,'situp':5,'dumbbell':6}
+        self.temp=[]
         
+
     async def recv(self):
         try:
             
@@ -213,10 +222,10 @@ class VideoTransformTrack2(MediaStreamTrack):
             frame = await self.track.recv()
             img = frame.to_ndarray(format="bgr24")
             
-            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            img = cv2.flip(img, 0)
+            # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            # img = cv2.flip(img, 1)
             
-            if self.drop % 4 == 0:
+            if self.drop % 3 == 0:
                 self.drop = 0
                 pose_row = self.detector.all_classify(img)
                 self.sequence.append(np.array(pose_row))
@@ -238,6 +247,7 @@ class VideoTransformTrack2(MediaStreamTrack):
                 
                 if self.status[0] != "plank" and self.status[0] == self.before_status[0] and self.before_status[1] == "d" and self.status[1] == "u":
                     self.workout_cnt[self.status[0]] += 1
+                    self.cnt_list[self.index[self.status[0]]]+=1
                 
                 if self.status[0] != 'plank':
                     self.plank_start_time = 0
@@ -248,24 +258,25 @@ class VideoTransformTrack2(MediaStreamTrack):
                     self.plank_time = time.time()
                     if int(self.plank_time - self.plank_start_time) >= 1:
                         self.workout_cnt[self.status[0]] += int(self.plank_time - self.plank_start_time)
+                        self.cnt_list[3]+=1
                         self.plank_start_time = self.plank_time
                 self.before_status = self.status
+                self.progress['cnt']=self.cnt_list
                 try:
-                    if self.channel is not None :
+                    if self.channel is not None and self.temp!=self.progress:
                         self.channel.send(
-                            json.dumps(self.workout_cnt)
+                            json.dumps(self.progress)
                         )
+                        self.temp=copy.deepcopy(self.progress)
+
                 except Exception as e:
                     print(e)
-            
             
             for i in self.key:
                 if self.workout_cnt[i] != 0:
                     self.cnt += 30
                     self.workout[i] = self.cnt
                     self.key.remove(i)
-
-              
                     
 
             cv2.putText(img, 'pushup' + str(self.workout_cnt['pushup']), (30, self.workout['pushup']), 

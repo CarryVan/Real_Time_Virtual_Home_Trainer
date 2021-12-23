@@ -102,12 +102,21 @@ function createPeerConnection() {
 	}
 	
 	channel.onmessage = function(event) {
-		count=event.data
-		localStorage.setItem("count",count)
+		data=event.data
+		console.log(data)
+
+		if (data != 'msg'){
+			data = JSON.parse(data)
+			localStorage.setItem("exercise", data.exercise)
+			localStorage.setItem("cnt", data.cnt)
+			localStorage.setItem("set", data.set)
+			localStorage.setItem("exit", data.exit)
+		}
+			
+		
 		if(event.data.includes("finish")){
 			stop();
 		}
-		
 	}
 	// register some listeners to help debugging
 	pc.addEventListener('icegatheringstatechange', function() {
@@ -155,7 +164,6 @@ function negotiate() {
 					}
 			});
 	}).then(function() {
-			// console.log("offer")
 			var offer = pc.localDescription;
 			return fetch('/offer', {
 				body: JSON.stringify({
@@ -211,24 +219,10 @@ function start() {
 	localStorage.setItem("cnt", cnt_list)
 	localStorage.setItem("set", set_list)
 	localStorage.setItem("breaktime", breaktime_list)
+	localStorage.setItem("exit", 1)
+
 	location.href = "start.html";
 
-	fetch("/save_workout", {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			exercise: localStorage.getItem("exercise"),
-			cnt: localStorage.getItem("cnt"),
-			set: localStorage.getItem("set"),
-			breaktime: localStorage.getItem("breaktime")
-		})
-	})
-	.then(response => response.json())
-	.then(data => console.log(data))
-
-	
 }
 
 function start_camera(){
@@ -236,20 +230,20 @@ function start_camera(){
 
 	var constraints = {
 			audio: false,
-			video: false,
+			video: true,
 	};
 
-	var resolution = "700x400";
-	if (resolution) {
-			resolution = resolution.split('x');
-			constraints.video = {
-					width: parseInt(window.innerHeight, 0),
-					height: parseInt(window.innerWidth, 0),
-					facingMode: "user",
-			};
-	} else {
-			constraints.video = true;
-	}
+	// var resolution = "700x400";
+	// if (resolution) {
+	// 		resolution = resolution.split('x');
+	// 		constraints.video = {
+	// 				width: parseInt(window.innerHeight, 0),
+	// 				height: parseInt(window.innerWidth, 0),
+	// 				facingMode: "user",
+	// 		};
+	// } else {
+	// 		constraints.video = true;
+	// }
 
 	if (constraints.video) {
 		document.getElementById('media').style.display = 'block';
@@ -264,8 +258,6 @@ function start_camera(){
 	});
 
 }
-
-
 
 function negotiate_live() {
 	return pc.createOffer().then(function(offer) {
@@ -308,27 +300,25 @@ function negotiate_live() {
 }
 
 
-
-
 function live_camera(){
 	pc = createPeerConnection();
 
 	var constraints = {
 			audio: false,
-			video: false,
+			video: true,
 	};
 
-	var resolution = "700x400";
-	if (resolution) {
-			resolution = resolution.split('x');
-			constraints.video = {
-					width: parseInt(window.innerHeight, 0),
-					height: parseInt(window.innerWidth, 0),
-					facingMode: "user",
-			};
-	} else {
-			constraints.video = true;
-	}
+	// var resolution = "700x400";
+	// if (resolution) {
+	// 		resolution = resolution.split('x');
+	// 		constraints.video = {
+	// 				width: parseInt(window.innerHeight, 0),
+	// 				height: parseInt(window.innerWidth, 0),
+	// 				facingMode: "user",
+	// 		};
+	// } else {
+	// 		constraints.video = true;
+	// }
 
 	if (constraints.video) {
 		document.getElementById('media').style.display = 'block';
@@ -341,7 +331,6 @@ function live_camera(){
 	}, function(err) {
 			alert('Could not acquire media: ' + err);
 	});
-
 }
 
 
@@ -408,5 +397,21 @@ function record(){
 	console.log(localStorage.getItem("count"))
 }
 function stop(){
+
+	fetch("/save_workout", {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			exercise: localStorage.getItem("exercise").split(','),
+			cnt: localStorage.getItem("cnt").split(','),
+			set: localStorage.getItem("set").split(','),
+			exit: localStorage.getItem("exit")
+		})
+	})
+	.then(response => response.json())
+	.then(data => console.log(data))
+	
 	location.href = "record.html";
 }
