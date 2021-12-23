@@ -102,8 +102,9 @@ function createPeerConnection() {
 	}
 	
 	channel.onmessage = function(event) {
-
 		data=event.data
+		console.log(data)
+
 		if (data != 'msg'){
 			data = JSON.parse(data)
 			localStorage.setItem("exercise", data.exercise)
