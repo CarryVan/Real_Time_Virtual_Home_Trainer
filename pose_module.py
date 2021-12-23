@@ -68,7 +68,7 @@ class poseDetector:
         elif y==6:
             org=((h),(h))
         
-        draw.text(org,text,font=font,fill=(255,255,255))
+        draw.text(org,text,font=font,fill=(0,0,0))
         return img
     def title(self, img,title,plus,size1=0.2,size2=0.2,y1=0,y2=1):
         img.flags.writeable = True

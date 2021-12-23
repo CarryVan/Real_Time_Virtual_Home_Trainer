@@ -212,8 +212,9 @@ class VideoTransformTrack2(MediaStreamTrack):
         self.progress['exit']=0
         self.cnt_list=[0,0,0,0,0,0,0]
         self.index={'lunge':0,'squat':1,'legraise':2,'plank':3,'pushup':4,'situp':5,'dumbbell':6}
+        self.temp=[]
         
-        
+
     async def recv(self):
         try:
             
@@ -224,7 +225,7 @@ class VideoTransformTrack2(MediaStreamTrack):
             # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             # img = cv2.flip(img, 1)
             
-            if self.drop % 4 == 0:
+            if self.drop % 3 == 0:
                 self.drop = 0
                 pose_row = self.detector.all_classify(img)
                 self.sequence.append(np.array(pose_row))
@@ -262,10 +263,12 @@ class VideoTransformTrack2(MediaStreamTrack):
                 self.before_status = self.status
                 self.progress['cnt']=self.cnt_list
                 try:
-                    if self.channel is not None :
+                    if self.channel is not None and self.temp!=self.progress:
                         self.channel.send(
                             json.dumps(self.progress)
                         )
+                        self.temp=copy.deepcopy(self.progress)
+
                 except Exception as e:
                     print(e)
             

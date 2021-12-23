@@ -211,10 +211,21 @@ nav .hamburger .line{
   width:25%;
 }
 
+.inner .date .mode{
+  width:100%;
+  height:40%;
+  font-size: 2vh;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2vh;
+  text-decoration: underline;
+}
+
+
 .inner .date .title{
   width:100%;
   height:30%;
-  font-size: 3.5vh;
+  font-size: 2vh;
   font-weight: bold;
   text-align: center;
 }
@@ -222,7 +233,7 @@ nav .hamburger .line{
 .inner .date .dw{
   height:30%;
   width:100%;
-  font-size: 3vh;
+  font-size: 2vh;
   font-weight: bold;
   text-align: center;
   color: rgba(0, 0, 0, 0.7)

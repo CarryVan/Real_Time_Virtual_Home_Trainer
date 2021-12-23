@@ -160,13 +160,14 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
         sw = SaveWorkout
         sw.workout_session = int(most_recent.id)
         sw.sequence = i
-          
+        
         sw.workout_name = exercise[i]
         sw.set = set[i]
         sw.count = cnt[i]
-            
-        crud.save_counted_workout(db, sw)
-    
+        
+        if sw.count > 0:
+            crud.save_counted_workout(db, sw)
+ 
     return "saved!"
     
 @app.post("/workout_data")
@@ -179,6 +180,7 @@ async def recent_workouts(db: Session = Depends(get_db)):
 
        workout_flow = crud.get_workout_flows_by_id(db, session.id)
        workout_flow.insert(0, session.date_time)
+       workout_flow.insert(1, session.exit)
        if len(return_list) < 7:
            return_list.append(workout_flow)
 
@@ -235,3 +237,9 @@ async def on_shutdown(app):
     coros = [pc.close() for pc in pcs]
     await asyncio.gather(*coros)
     pcs.clear()
+
+if __name__ == "__main__":
+    uvicorn.run("server:app",
+                host="0.0.0.0",
+                port=8080,
+                reload=True)
