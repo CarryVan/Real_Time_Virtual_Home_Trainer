@@ -45,7 +45,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.flow = -1
         with open(f'./model/{str(self.exercise_list[0])}_model/body_language_mlp.pkl', 'rb') as f:
             self.model = pickle.load(f)
-        self.status = "None"
+        self.status = ""
         self.i = 0
         self.idxx = 10
         self.sports = ""
@@ -59,131 +59,118 @@ class VideoTransformTrack(MediaStreamTrack):
         self.progress['cnt']=self.goal
         self.progress['set']=[0]*len(self.cnt_list)
         self.progress['exit']=1
+        self.results={}
     async def recv(self):
         self.drop += 1
         frame = await self.track.recv()
-        if self.drop % 3 == 0:
-            self.drop = 0
-            # pose estimate
-            img = frame.to_ndarray(format="bgr24")
-            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            img = cv2.flip(img, 0)
-            if self.i < len(self.exercise_list):
-                if self.flow == -1:
-                    self.start_time = time.time()
-                    self.sports = self.exercise_list[self.i]
-                    self.label_d = f'{self.sports}_d'
-                    self.label_u = f'{self.sports}_u'
-                    self.preposture = self.label_u
-                    self.SPORTS = self.sports.upper()
-                    if self.sports == 'plank':
-                        self.idxx = 11
-                        self.label_d = f'{self.sports}_x'
-                    elif self.sports == 'pushup':
-                        self.SPORTS = "PUSH-UP"
-                    elif self.sports == 'squat' or self.sports =='lunge':
-                        self.preposture = self.label_d
-                    elif self.sports =="legraise":
-                        temp=self.label_d
-                        self.label_d=self.label_u
-                        self.label_u=temp
-                    self.flow = 0
-                    
-                if self.flow == 0 and time.time()-self.start_time < self.time:
-                    img = self.detector.title(
-                        img, self.SPORTS, str(self.cnt_list[self.i]))
-                elif self.flow == 0 and time.time()-self.start_time >= self.time:
-                    self.flow = 1
+        img = frame.to_ndarray(format="bgr24")
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        img = cv2.flip(img, 0)
+        if self.i < len(self.exercise_list):
+            if self.flow == -1:
+                self.start_time = time.time()
+                self.sports = self.exercise_list[self.i]
+                self.label_d = f'{self.sports}_d'
+                self.label_u = f'{self.sports}_u'
+                self.preposture = self.label_u
+                self.SPORTS = self.sports.upper()
+                if self.sports == 'plank':
+                    self.idxx = 11
+                    self.label_d = f'{self.sports}_x'
+                elif self.sports == 'pushup':
+                    self.SPORTS = "PUSH-UP"
+                elif self.sports == 'squat' or self.sports =='lunge':
+                    self.preposture = self.label_d
+                elif self.sports =="legraise":
+                    temp=self.label_d
+                    self.label_d=self.label_u
+                    self.label_u=temp
+                self.flow = 0
                 
-                if self.flow == 1 and self.posture != self.preposture:
-                    img, self.posture = self.detector.set_posture(
-                        img, self.idxx, self.model, "None",self.preposture, f'./dataset/example/{self.sports}.JPG', 200)
-                    
-                elif self.flow == 1 and self.posture == self.preposture:
-                    self.flow = 2
-                
-                if self.flow == 2 and self.cnt < self.goal[self.i]:
-                    if self.idxx == 11:
-                        img, self.status, self.cnt, self.plank_time = self.detector.exercise(
-                            img, self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i], self.plank_time)
-                    else:
-                        img, self.status, self.cnt = self.detector.exercise(
-                            img, self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i])
-                        self.finish_time = time.time()
-                    
-                elif self.flow == 2 and self.cnt >= self.goal[self.i]:
-                    self.flow = 3
-
-                if self.flow == 3 and time.time()-self.finish_time < 0.8:
-                    img = self.detector.complete_sports(
-                        img, self.cnt, self.goal[self.i])
-                    self.break_time = time.time()
-                    self.progress['set'][self.i]=self.pre_set
-                    if self.channel is not None:
-                        self.channel.send(
-                            json.dumps(self.progress)
-                        )
-                elif self.flow == 3 and time.time() - self.finish_time >= 0.8:
-                    
-                    if self.i == len(self.exercise_list)-1 and self.pre_set==self.set_list[self.i]:
-                        self.flow = 6
-                        self.goodjob_time = time.time()
-                    else:
-                        self.flow = 4
-                        self.breaktime = self.breaktime_list[self.i]
-
-                if self.flow == 4 and time.time()-self.break_time < self.breaktime:
-                    img = self.detector.title(img, "BREAK TIME", str(
-                        self.breaktime-int(time.time()-self.break_time)))
-                    self.next_time = time.time()
-
-                elif self.flow == 4 and time.time()-self.break_time >= self.breaktime:
-                    self.flow = 5
-
-                if self.flow == 5 and time.time()-self.next_time < self.time:
-                    if self.pre_set==self.set_list[self.i]:
-                        img = self.detector.title(
-                            img, "FINISH", "next "+f"{self.exercise_list[self.i+1]}".upper())
-                    else:
-                        img= self.detector.title(
-                            img, "FINISH", "next SET "+ str(self.pre_set+1))
-                elif self.flow == 5 and time.time()-self.next_time >= self.time:
-                    if self.pre_set==self.set_list[self.i]:
-                        self.i += 1
-                        self.preposture = f'{str(self.exercise_list[self.i])}_u'
-                        with open(f'./model/{str(self.exercise_list[self.i])}_model/body_language_mlp.pkl', 'rb') as f:
-                            self.model = pickle.load(f)
-                        self.pre_set=1
-                        self.total_set=1
-                        self.idxx=10
-                    else:
-                        self.pre_set+=1
-                        self.total_set+=1
-                    self.flow = -1
-                    self.posture = "None"
-                    self.cnt = 0
-                ##현재 정해진 운동 완료하면 자동으로 record로 가는데, 계속 띄워놓고 싶으면 이걸로
-                # if self.flow == 6:
-                    # img = self.detector.title(img, "EXCELLENT", "내일 또 만나요",105,50,6,7)
-                        
-                if self.flow == 6 and time.time()-self.goodjob_time < self.time:
-                    img = self.detector.title(img, "Excellent", "내일 또 만나요",105,50,6,7)
-
-                elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
-                    self.progress['finish']=1
-                    if self.channel is not None:
-                        self.channel.send(
-                            json.dumps(self.progress)
-                        )
-
-            new_frame = VideoFrame.from_ndarray(img, format="bgr24")
-            new_frame.pts = frame.pts
-            new_frame.time_base = frame.time_base
-            self.before_frame = new_frame
+            if self.flow == 0 and time.time()-self.start_time < self.time:
+                img = self.detector.title(
+                    img, self.SPORTS, str(self.cnt_list[self.i]))
+            elif self.flow == 0 and time.time()-self.start_time >= self.time:
+                self.flow = 1
             
-            return new_frame
-        else:
-            return self.before_frame
+            if self.flow == 1 and self.posture != self.preposture:
+                img, self.posture,self.results = self.detector.set_posture(
+                    img,self.drop, self.results,self.idxx, self.model, "None",self.preposture, f'./dataset/example/{self.sports}.JPG', 200)
+                
+            elif self.flow == 1 and self.posture == self.preposture:
+                self.flow = 2
+            
+            if self.flow == 2 and self.cnt < self.goal[self.i]:
+                if self.idxx == 11:
+                    img, self.status, self.cnt, self.plank_time,self.results = self.detector.exercise(
+                        img, self.drop,self.results,self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i], self.plank_time)
+                else:
+                    img, self.status, self.cnt,self.results = self.detector.exercise(
+                        img, self.drop,self.results,self.idxx, self.model, self.status, self.label_d, self.label_u, self.preposture, self.cnt, self.goal[self.i])
+                    self.finish_time = time.time()
+                
+            elif self.flow == 2 and self.cnt >= self.goal[self.i]:
+                self.flow = 3
+            if self.flow == 3 and time.time()-self.finish_time < 0.8:
+                img = self.detector.complete_sports(
+                    img, self.status,self.cnt, self.goal[self.i])
+                self.break_time = time.time()
+                self.progress['set'][self.i]=self.pre_set
+                if self.channel is not None:
+                    self.channel.send(
+                        json.dumps(self.progress)
+                    )
+            elif self.flow == 3 and time.time() - self.finish_time >= 0.6:
+                
+                if self.i == len(self.exercise_list)-1 and self.pre_set==self.set_list[self.i]:
+                    self.flow = 6
+                    self.goodjob_time = time.time()
+                else:
+                    self.flow = 4
+                    self.breaktime = self.breaktime_list[self.i]
+            if self.flow == 4 and time.time()-self.break_time < self.breaktime:
+                img = self.detector.title(img, "BREAK TIME", str(
+                    self.breaktime-int(time.time()-self.break_time)))
+                self.next_time = time.time()
+            elif self.flow == 4 and time.time()-self.break_time >= self.breaktime:
+                self.flow = 5
+            if self.flow == 5 and time.time()-self.next_time < self.time:
+                if self.pre_set==self.set_list[self.i]:
+                    img = self.detector.title(
+                        img, "FINISH", "next "+f"{self.exercise_list[self.i+1]}".upper())
+                else:
+                    img= self.detector.title(
+                        img, "FINISH", "next SET "+ str(self.pre_set+1))
+            elif self.flow == 5 and time.time()-self.next_time >= self.time:
+                if self.pre_set==self.set_list[self.i]:
+                    self.i += 1
+                    self.preposture = f'{str(self.exercise_list[self.i])}_u'
+                    with open(f'./model/{str(self.exercise_list[self.i])}_model/body_language_mlp.pkl', 'rb') as f:
+                        self.model = pickle.load(f)
+                    self.pre_set=1
+                    self.total_set=1
+                    self.idxx=10
+                else:
+                    self.pre_set+=1
+                    self.total_set+=1
+                self.flow = -1
+                self.posture = "None"
+                self.cnt = 0
+            
+            if self.flow == 6 and time.time()-self.goodjob_time < self.time:
+                img = self.detector.title(img, "Excellent", "내일 또 만나요",0.22,0.16,0,1)
+            elif self.flow == 6 and time.time()-self.goodjob_time >= self.time:
+                self.progress['finish']=1
+                if self.channel is not None:
+                    self.channel.send(
+                        json.dumps(self.progress)
+                    )
+        new_frame = VideoFrame.from_ndarray(img, format="bgr24")
+        new_frame.pts = frame.pts
+        new_frame.time_base = frame.time_base
+        self.before_frame = new_frame
+        
+        return new_frame
 
 class VideoTransformTrack2(MediaStreamTrack):
     
