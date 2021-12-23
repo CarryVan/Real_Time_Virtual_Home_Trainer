@@ -226,8 +226,8 @@ class VideoTransformTrack2(MediaStreamTrack):
             frame = await self.track.recv()
             img = frame.to_ndarray(format="bgr24")
             
-            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            img = cv2.flip(img, 0)
+            # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            # img = cv2.flip(img, 0)
             
             if self.drop % 4 == 0:
                 self.drop = 0

@@ -148,7 +148,6 @@ async def one(request: Request):
 @app.post("/save_workout")
 async def save_workout(params: Info, db: Session = Depends(get_db)):
     
-    print(f"params: {params}")
     exercise = params.exercise
     cnt = params.cnt
     set = params.set
@@ -242,6 +241,7 @@ async def on_shutdown(app):
     coros = [pc.close() for pc in pcs]
     await asyncio.gather(*coros)
     pcs.clear()
+    
 if __name__ == "__main__":
     uvicorn.run("server:app",
                 host="0.0.0.0",
