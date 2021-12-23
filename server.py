@@ -165,7 +165,7 @@ async def save_workout(params: Info, db: Session = Depends(get_db)):
         sw.set = set[i]
         sw.count = cnt[i]
         
-        if sw.count > 0:
+        if int(sw.count) > 0:
             crud.save_counted_workout(db, sw)
  
     return "saved!"
