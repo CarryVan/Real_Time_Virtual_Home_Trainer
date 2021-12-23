@@ -43,7 +43,7 @@ class poseDetector:
             return img
         width,height=img.size
         draw = ImageDraw.Draw(img)
-        fontsize=1
+        fontsize=10
         text=str(title)
 
         font=ImageFont.truetype("font/GodoM.ttf",fontsize)
@@ -93,7 +93,7 @@ class poseDetector:
         empty_img=img
         img[y:y+sh,x:x+sw]=overlay_alpha*src[:,:,:3]+background_alpha*img[y:y+sh,x:x+sw]
 
-        if drop%4==0:
+        if drop%3==0:
             results = self.pose.process(empty_img)
             try:
                 psland=results.pose_landmarks
@@ -118,7 +118,7 @@ class poseDetector:
         margin=int(width*0.1)
         pad=int(height*0.85)
         empty_img=img
-        if drop%4==0:
+        if drop%3==0:
             results = self.pose.process(empty_img)
             
             try:
